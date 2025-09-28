@@ -309,6 +309,69 @@ function showProvaBloqueadaModal() {
     });
 }
 
+// NOVO: Modal de alteração de senha (Admin / Super)
+function showChangePwdModalManager(user, isSuperAdmin = false){
+  const html = `
+    <div style="display:flex;justify-content:space-between;align-items:center"><h3>Alterar minha senha</h3><button id="closeP" class="button ghost">Fechar</button></div>
+    <form id="formPwd" style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
+      <label style="position:relative;"><span class="small-muted">Senha atual</span>
+        <input type="password" id="curPwd" required style="padding-right: 36px;"/>
+        <span class="password-toggle-icon" id="toggleCurPwd">🔒️</span>
+      </label>
+      <label style="position:relative;"><span class="small-muted">Nova senha</span>
+        <input type="password" id="newPwd" required style="padding-right: 36px;"/>
+        <span class="password-toggle-icon" id="toggleNewPwd">🔒️</span>
+      </label>
+      <div style="display:flex;justify-content:flex-end;gap:8px"><button type="submit" class="button">Alterar</button></div>
+    </form>
+  `;
+  const m = showModal(html);
+  m.modal.querySelector('#closeP').addEventListener('click', ()=> { m.close(); m.cleanup(); });
+
+  const toggleCurPwd = m.modal.querySelector('#toggleCurPwd');
+  const curPwd = m.modal.querySelector('#curPwd');
+  // Ajuste de estilo via JS
+  toggleCurPwd.style.position = 'absolute';
+  toggleCurPwd.style.right = '10px';
+  toggleCurPwd.style.top = '50%';
+  toggleCurPwd.style.transform = 'translateY(-50%)';
+  toggleCurPwd.style.cursor = 'pointer';
+  toggleCurPwd.addEventListener('click', () => {
+      const type = curPwd.getAttribute('type') === 'password' ? 'text' : 'password';
+      curPwd.setAttribute('type', type);
+      toggleCurPwd.textContent = type === 'password' ? '🔒' : '🔓';
+  });
+
+  const toggleNewPwd = m.modal.querySelector('#toggleNewPwd');
+  const newPwd = m.modal.querySelector('#newPwd');
+  // Ajuste de estilo via JS
+  toggleNewPwd.style.position = 'absolute';
+  toggleNewPwd.style.right = '10px';
+  toggleNewPwd.style.top = '50%';
+  toggleNewPwd.style.transform = 'translateY(-50%)';
+  toggleNewPwd.style.cursor = 'pointer';
+  toggleNewPwd.addEventListener('click', () => {
+      const type = newPwd.getAttribute('type') === 'password' ? 'text' : 'password';
+      newPwd.setAttribute('type', type);
+      toggleNewPwd.textContent = type === 'password' ? '🔒' : '🔓';
+  });
+
+  m.modal.querySelector('#formPwd').addEventListener('submit', async (ev)=> {
+    ev.preventDefault();
+    const cur = m.modal.querySelector('#curPwd').value;
+    const np = m.modal.querySelector('#newPwd').value;
+    const u = (state.users || []).find(x=>x.id===session.userId);
+    if(!u) return alert('Usuário não encontrado');
+    if(u.password !== cur) return alert('Senha atual incorreta');
+    if(!np) return alert('Senha nova inválida');
+    u.password = np;
+    await save(state);
+    alert('Senha alterada');
+    m.close();
+    m.cleanup();
+  });
+}
+
 
 // Novo: Modal de pré-cadastro para estagiários
 function showPreRegistrationModal(){
@@ -388,67 +451,6 @@ function showPreRegistrationModal(){
     await save(state);
     alert('Pré-cadastro enviado com sucesso! Aguarde a aprovação do supervisor.');
     m.close(); m.cleanup();
-  });
-}
-
-// NOVO: Modal de alteração de senha (Administrador)
-function showChangePwdModalManager(user){
-  const html = `
-    <div style="display:flex;justify-content:space-between;align-items:center"><h3>Alterar minha senha</h3><button id="closeP" class="button ghost">Fechar</button></div>
-    <form id="formPwd" style="margin-top:8px;display:flex;flex-direction:column;gap:8px">
-      <label style="position:relative;"><span class="small-muted">Senha atual</span>
-        <input type="password" id="curPwd" required style="padding-right: 36px;"/>
-        <span class="password-toggle-icon" id="toggleCurPwd">🔒️</span>
-      </label>
-      <label style="position:relative;"><span class="small-muted">Nova senha</span>
-        <input type="password" id="newPwd" required style="padding-right: 36px;"/>
-        <span class="password-toggle-icon" id="toggleNewPwd">🔒️</span>
-      </label>
-      <div style="display:flex;justify-content:flex-end;gap:8px"><button type="submit" class="button">Alterar</button></div>
-    </form>
-  `;
-  const m = showModal(html);
-  m.modal.querySelector('#closeP').addEventListener('click', ()=> { m.close(); m.cleanup(); });
-
-  const toggleCurPwd = m.modal.querySelector('#toggleCurPwd');
-  const curPwd = m.modal.querySelector('#curPwd');
-  toggleCurPwd.style.position = 'absolute';
-  toggleCurPwd.style.right = '10px';
-  toggleCurPwd.style.top = '50%';
-  toggleCurPwd.style.transform = 'translateY(-50%)';
-  toggleCurPwd.style.cursor = 'pointer';
-  toggleCurPwd.addEventListener('click', () => {
-      const type = curPwd.getAttribute('type') === 'password' ? 'text' : 'password';
-      curPwd.setAttribute('type', type);
-      toggleCurPwd.textContent = type === 'password' ? '🔒' : '🔓';
-  });
-
-  const toggleNewPwd = m.modal.querySelector('#toggleNewPwd');
-  const newPwd = m.modal.querySelector('#newPwd');
-  toggleNewPwd.style.position = 'absolute';
-  toggleNewPwd.style.right = '10px';
-  toggleNewPwd.style.top = '50%';
-  toggleNewPwd.style.transform = 'translateY(-50%)';
-  toggleNewPwd.style.cursor = 'pointer';
-  toggleNewPwd.addEventListener('click', () => {
-      const type = newPwd.getAttribute('type') === 'password' ? 'text' : 'password';
-      newPwd.setAttribute('type', type);
-      toggleNewPwd.textContent = type === 'password' ? '🔒' : '🔓';
-  });
-
-  m.modal.querySelector('#formPwd').addEventListener('submit', async (ev)=> {
-    ev.preventDefault();
-    const cur = m.modal.querySelector('#curPwd').value;
-    const np = m.modal.querySelector('#newPwd').value;
-    const u = (state.users || []).find(x=>x.id===session.userId);
-    if(!u) return alert('Usuário não encontrado');
-    if(u.password !== cur) return alert('Senha atual incorreta');
-    if(!np) return alert('Senha nova inválida');
-    u.password = np;
-    await save(state);
-    alert('Senha alterada');
-    m.close();
-    m.cleanup();
   });
 }
 
@@ -913,6 +915,9 @@ function renderManager(user){
   // Calcula a contagem de pendências
   const pendingCount = (state.pendingRegistrations || []).length;
   const pendingClass = pendingCount > 0 ? 'has-pending' : '';
+  
+  // VERIFICA SE É O SUPER ADMIN para mostrar o botão de alteração de senha no topo
+  const isSuperAdmin = user.role === 'super';
 
   // Adicionando a nova seção de pré-cadastros ao layout do painel
   root.innerHTML = `
@@ -922,9 +927,11 @@ function renderManager(user){
       </div>
       <div class="muted small">Usuário: ${escapeHtml(user.username)} • ${escapeHtml(user.role)}</div>
       
-      ${user.role === 'admin' && user.selfPasswordChange ? 
+      ${isSuperAdmin ? 
+        `<button class="button" id="btnChangePwdSuper" style="width: 100%; margin: 8px 0;">Alterar Senha</button><hr style="border-color: #eee; margin: 8px 0;">` :
+        (user.role === 'admin' && user.selfPasswordChange ? 
         `<button class="button ghost" id="btnChangePwdMgr" style="width: 100%; margin: 8px 0;">Alterar Senha</button><hr style="border-color: #eee; margin: 8px 0;">` : 
-        `<hr style="border-color: #eee; margin: 8px 0;">`
+        `<hr style="border-color: #eee; margin: 8px 0;">`)
       }
 
       <div class="sidebar-item active" data-section="geral">
@@ -1101,14 +1108,20 @@ function renderManager(user){
     });
   });
   // ********************************************************
+  
+  // ********** NOVO: Lógica para Alterar Senha Admin / Super **********
+  const btnChangePwdSuper = document.getElementById('btnChangePwdSuper');
+  if (btnChangePwdSuper) {
+      // Se for Super Admin, usa a função genérica para trocar a própria senha
+      btnChangePwdSuper.addEventListener('click', () => showChangePwdModalManager(user, true));
+  }
 
-  // ********** NOVO: Lógica para Alterar Senha Admin **********
   const btnChangePwdMgr = document.getElementById('btnChangePwdMgr');
   if (btnChangePwdMgr) {
       btnChangePwdMgr.addEventListener('click', () => {
           const manager = (state.users || []).find(u => u.id === session.userId);
           if (manager.role === 'admin' && manager.selfPasswordChange) {
-              showChangePwdModalManager(manager);
+              showChangePwdModalManager(manager, false);
           } else {
               alert('Você não tem permissão ou não é um administrador secundário para alterar a senha por aqui.');
           }
@@ -2100,21 +2113,24 @@ async function deleteSelectedUsers() {
 function renderUsersList(){
   const q = document.getElementById('searchMgmt').value.trim().toLowerCase();
   const container = document.getElementById('usersList'); container.innerHTML='';
-  let list = (state.users || []).slice();
   
-  // 1. Aplicar Filtro de Cargo
+  // 1. Aplicar Filtro principal: Remove o Super Admin (role: 'super')
+  let list = (state.users || []).filter(u => u.role !== 'super').slice();
+  
+  // 2. Aplicar Filtro de Cargo (mantido, mas não inclui 'super' na lista)
   if (userFilter === 'intern') {
       list = list.filter(u => u.role === 'intern');
   } else if (userFilter === 'admin') {
-      list = list.filter(u => u.role === 'admin' || u.role === 'super');
+      // O filtro 'admin' agora só lista admins secundários, pois o 'super' foi removido
+      list = list.filter(u => u.role === 'admin');
   }
   
-  // 2. Aplicar Filtro de Pesquisa
+  // 3. Aplicar Filtro de Pesquisa
   if(q) list = list.filter(u => (u.username||'').toLowerCase().includes(q) || (u.name||'').toLowerCase().includes(q) || (u.internId && findInternById(u.internId)?.name.toLowerCase().includes(q)) || (u.id||'').toLowerCase().includes(q));
   
   document.getElementById('totalUsers').textContent = list.length;
   
-  // 3. Organização por Ordem Alfabética (Nome do Estagiário, depois Usuário)
+  // 4. Organização por Ordem Alfabética (Nome do Estagiário, depois Usuário)
   list.sort((a,b)=> {
     const aName = a.role === 'intern' ? (findInternById(a.internId)?.name || a.name || a.username) : (a.name || a.username);
     const bName = b.role === 'intern' ? (findInternById(b.internId)?.name || b.name || b.username) : (b.name || a.username);
@@ -2149,8 +2165,8 @@ function renderUsersList(){
     const createdDate = formatDate(u.createdAt);
     const roleAndDateDisplay = `${roleText} (${createdDate})`;
     
-    // NOVO: Verifica se o usuário é o Super Admin
-    const isSuperAdmin = u.role === 'super';
+    // O Super Admin já foi removido pelo filtro inicial.
+    const isSuperAdmin = false; 
     
     // 1. Checkbox
     const checkboxHtml = canDelete && !isSuperAdmin
