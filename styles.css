@@ -1,20 +1,26 @@
 :root{
-  --bg:#f6f7f9;
-  --panel:#ffffff;
-  --muted:#6b7280;
-  --accent:#6b8e23; /* musgo (olive-ish) as primary */
-  --accent-2:#9acd9a; /* light green */
+  /* Paleta principal (versão teste) */
+  --bg: #f5f6f7;             /* cinza muito claro de fundo */
+  --panel: #ffffff;          /* cartão / painéis (branco) */
+  --muted: #6b7280;          /* texto secundário (cinza) */
+  --accent: #013e4a;         /* azul petróleo (principal) */
+  --accent-2: #2b6cb0;       /* azul secundário */
   --card-shadow: 0 8px 24px rgba(16,24,40,0.06);
-  --danger:#ef4444;
-  --ok:#10b981;
-  /* Novas cores para o login moderno */
+  --danger: #ef4444;         /* vermelho para ações destrutivas */
+  --ok: #10b981;             /* sucesso (mantido) */
   --input-bg: #f3f4f6;
   --input-border: #e5e7eb;
-  /* NOVO: Estilos para exclusão em lote */
   --checkbox-size: 20px;
+
+  /* Gradientes / sombras */
+  --gradient-primary: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
+
+/* Reset e tipografia */
 *{box-sizing:border-box;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial}
-body{margin:0;background:linear-gradient(180deg,#fbfdf9,#f3f6f3);color:#0f172a;min-height:100vh}
+body{margin:0;background:linear-gradient(180deg,#fbfdf9,var(--bg));color:#0f172a;min-height:100vh}
 
 /* --- ESTILOS GERAIS DA APLICAÇÃO --- */
 .app{
@@ -45,9 +51,11 @@ body{margin:0;background:linear-gradient(180deg,#fbfdf9,#f3f6f3);color:#0f172a;m
   align-items: center;
   gap: 12px;
   transition: background-color 0.2s, color 0.2s;
+  position: relative;
+  overflow: hidden;
 }
 .sidebar-item:hover {
-  background-color: rgba(107, 142, 35, 0.1);
+  background-color: rgba(1,62,74,0.08); /* azul petróleo suave */
   color: var(--accent);
 }
 .sidebar-item.active {
@@ -73,11 +81,11 @@ body{margin:0;background:linear-gradient(180deg,#fbfdf9,#f3f6f3);color:#0f172a;m
 h1{margin:0;font-size:20px;color:var(--accent)}
 .muted{color:var(--muted);font-size:13px}
 .inline{display:inline-flex;gap:8px;align-items:center}
-.card{background:var(--panel);padding:16px;border-radius:12px;box-shadow:var(--card-shadow);border:1px solid rgba(15,23,42,0.03); margin-bottom: 20px;}
+.card{background:var(--gradient-card);padding:16px;border-radius:12px;box-shadow:var(--shadow-lg);border:1px solid rgba(15,23,42,0.03); margin-bottom: 20px;}
 .grid{display:grid;grid-template-columns:1fr 380px;gap:18px}
 .list{max-height:640px;overflow:auto}
 .row{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:10px;border:1px solid rgba(15,23,42,0.03);margin-bottom:10px;background:linear-gradient(180deg,transparent,#ffffff)}
-/* NOVO: Estilo para a linha de usuários que inclui checkbox */
+/* Estilo para a linha de usuários que inclui checkbox */
 .user-row-selectable {
   display: grid;
   grid-template-columns: var(--checkbox-size) 1fr auto; /* Checkbox | Detalhes | Ações */
@@ -100,11 +108,11 @@ h1{margin:0;font-size:20px;color:var(--accent)}
   cursor: default;
 }
 
-.chip{background:rgba(152,187,79,0.08);padding:6px 8px;border-radius:999px;font-size:12px;color:var(--accent)}
+.chip{background:rgba(1,62,74,0.08);padding:6px 8px;border-radius:999px;font-size:12px;color:var(--accent)}
 .small{font-size:13px}
-.button{background:var(--accent);color:white;border:0;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600}
-.button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(107,142,35,0.12)}
-.button.alt{background:var(--accent-2);color:#13320f}
+.button{background:var(--gradient-primary);color:white;border:0;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:600;transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1)}
+.button.ghost{background:transparent;color:var(--accent);border:1px solid rgba(1,62,74,0.12)}
+.button.alt{background:var(--accent-2);color:white}
 .button.danger{background:var(--danger);color:white}
 .controls{display:flex;gap:8px;align-items:center;margin-bottom:8px}
 .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
@@ -113,7 +121,7 @@ h1{margin:0;font-size:20px;color:var(--accent)}
 .calendar .day{min-height:80px;padding:8px;border-radius:8px;background:linear-gradient(180deg,#ffffff,#fbfbf8);border:1px solid rgba(15,23,42,0.03)}
 .calendar .date{font-weight:700;margin-bottom:6px}
 .tag{display:inline-block;padding:4px 6px;border-radius:6px;font-size:12px;margin-top:4px}
-.tag.bank{background:rgba(154,205,154,0.18);color:var(--accent-2)}
+.tag.bank{background:var(--accent);color:white;font-weight:600;padding:4px 8px;line-height:1;white-space:nowrap}
 .tag.neg{background:rgba(239,68,68,0.10);color:var(--danger)}
 .totals{display:flex;gap:12px;align-items:center;margin-top:10px;flex-wrap:wrap}
 .total-pill{padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#fbfbfb);min-width:200px;text-align:center;border:1px solid rgba(15,23,42,0.03)}
@@ -146,39 +154,10 @@ h1{margin:0;font-size:20px;color:var(--accent)}
 
 @media (max-width:980px){.grid{grid-template-columns:1fr;} .calendar .day{min-height:64px}}
 
-
-/*adicionei a parte*/
-/* Adicionar ao CSS existente */
-:root {
-  --gradient-primary: linear-gradient(135deg, #6b8e23 0%, #9acd9a 100%);
-  --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
-  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-}
-
-.card {
-  background: var(--gradient-card);
-  box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.button {
-  background: var(--gradient-primary);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.button:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-/* Animações suaves */
+/* Animações suaves e efeitos modernos */
 .sidebar-item {
   transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
 }
-
 .sidebar-item::before {
   content: '';
   position: absolute;
@@ -190,7 +169,6 @@ h1{margin:0;font-size:20px;color:var(--accent)}
   transition: left 0.3s ease;
   z-index: -1;
 }
-
 .sidebar-item:hover::before {
   left: 0;
 }
@@ -201,13 +179,12 @@ h1{margin:0;font-size:20px;color:var(--accent)}
   background-size: 200% 100%;
   animation: loading 1.5s infinite;
 }
-
 @keyframes loading {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
 }
 
-/* Adicionado para os itens da lixeira */
+/* Itens da lixeira */
 .trash-item-row {
   display: flex;
   align-items: center;
@@ -218,39 +195,32 @@ h1{margin:0;font-size:20px;color:var(--accent)}
   margin-bottom: 10px;
   background: linear-gradient(180deg,transparent,#ffffff);
 }
-
 .trash-item-row input[type="checkbox"] {
   width: auto;
 }
-
 .trash-item-details {
   flex-grow: 1;
 }
 
-/* PENDÊNCIAS PRÉ-CADASTRO - Estilos sugeridos */
-
-/* Estilo para o Balão de Contagem (Badge) */
+/* Balão de contagem (badge) na sidebar */
 .sidebar-item .badge {
-  background-color: var(--danger); /* Cor vermelha para alerta */
+  background-color: var(--danger);
   color: white;
   padding: 4px 8px;
-  border-radius: 999px; /* Torna o balão arredondado/oval */
+  border-radius: 999px;
   font-size: 10px;
   min-width: 20px;
   text-align: center;
-  margin-left: auto; /* Alinha o balão à direita do texto do item */
+  margin-left: auto;
   font-weight: 700;
-  line-height: 1; /* Garante que o número fique centralizado */
+  line-height: 1;
 }
-
-/* Novo estilo: Destaca o item quando tem pendência */
 .sidebar-item.has-pending {
-  background-color: rgba(239, 68, 68, 0.1); /* Fundo sutilmente vermelho claro */
-  color: var(--danger); /* Texto vermelho */
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
   border: 1px solid var(--danger);
-  padding: 11px; /* Ajusta o padding para manter o tamanho com a borda */
+  padding: 11px;
 }
-/* Garante que o hover/active não sobrescreva o balão facilmente */
 .sidebar-item.has-pending:hover {
   background-color: rgba(239, 68, 68, 0.2);
   color: var(--danger);
@@ -261,54 +231,32 @@ h1{margin:0;font-size:20px;color:var(--accent)}
     border: 1px solid var(--danger);
 }
 .sidebar-item.has-pending.active .badge {
-    /* Garante que o balão vermelho se destaque mesmo no fundo vermelho */
     background-color: white;
     color: var(--danger);
 }
 
-/* --- Início das mudanças para Folga-prova e Remover --- */
-
-/* Ajuste do botão 'Remover' no calendário para ser menor */
+/* Ajustes do calendário: botão Remover e wrapper */
 .calendar .day .button.ghost {
-  padding: 4px 6px; /* Diminui o padding para o botão ficar menor */
-  font-size: 10px; /* Diminui o tamanho da fonte */
-  white-space: nowrap; /* Evita que o texto quebre */
-  /* Adicionei para o botão "Remover" ter um espaçamento melhor */
+  padding: 4px 6px;
+  font-size: 10px;
+  white-space: nowrap;
   margin-left: 4px;
 }
-
-/* Ajuste da tag 'Folga-prova' para ficar mais visível */
-.tag.bank {
-  background-color: var(--accent); /* Usa a cor primária (verde musgo) como fundo */
-  color: white; /* Cor do texto branca para contraste */
-  font-weight: 600; /* Deixa a fonte mais negrito */
-  padding: 4px 8px; /* Ajusta o padding para melhor visual */
-  line-height: 1; /* Garante que o texto se alinhe bem */
-  white-space: nowrap; /* Impede a quebra de linha */
-}
-
-/* Ajuste no wrapper para garantir que o botão e a tag fiquem na mesma linha */
 .calendar .day .wrapper {
   display: flex;
   align-items: center;
-  gap: 4px; /* Pequeno espaçamento entre os itens */
+  gap: 4px;
 }
 
-/* =======================================
-   NOVO: ESTILOS MODERNOS PARA TELA DE LOGIN
-   ======================================= */
-
-/* 1. Layout da Tela de Login */
+/* --- Estilos modernos para Tela de Login (versão teste) --- */
 .login-screen {
     display: flex;
-    justify-content: center; /* Centraliza horizontalmente */
-    align-items: center; /* Centraliza verticalmente */
+    justify-content: center;
+    align-items: center;
     min-height: 100vh;
     padding: 20px;
-    background: linear-gradient(135deg, var(--bg) 0%, #f9fbf7 100%); /* Suavemente gradiente */
+    background: linear-gradient(135deg, var(--bg) 0%, #f9fbf7 100%);
 }
-
-/* 2. Cartão de Login */
 .login-card {
     max-width: 400px;
     width: 100%;
@@ -318,21 +266,17 @@ h1{margin:0;font-size:20px;color:var(--accent)}
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
     background: var(--panel);
 }
-
 .login-card h2 {
     color: var(--accent);
     margin-bottom: 24px;
     font-size: 1.8rem;
     font-weight: 700;
 }
-
-/* 3. Estilos dos Inputs (Mais suaves e modernos) */
 .login-input-group {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Aumenta o espaço entre os inputs */
+    gap: 15px;
 }
-
 .input-modern {
     width: 100%;
     padding: 12px 15px;
@@ -343,24 +287,19 @@ h1{margin:0;font-size:20px;color:var(--accent)}
     font-size: 15px;
     color: #374151;
 }
-
 .input-modern:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(107, 142, 35, 0.2);
+    box-shadow: 0 0 0 3px rgba(1,62,74,0.18);
     outline: none;
     background: white;
 }
-
-/* 4. Senha com Toggle Icon (Ajuste de alinhamento) */
 .password-wrapper {
     position: relative;
     width: 100%;
 }
-
 .password-wrapper .input-modern {
-    padding-right: 40px; /* Garante espaço para o ícone */
+    padding-right: 40px;
 }
-
 .password-toggle-icon {
     position: absolute;
     right: 15px;
@@ -371,46 +310,42 @@ h1{margin:0;font-size:20px;color:var(--accent)}
     font-size: 16px;
     transition: color 0.2s;
 }
-
 .password-toggle-icon:hover {
     color: var(--accent);
 }
-
-/* 5. Estilos dos Botões */
 .login-buttons {
     display: flex;
     gap: 10px;
     align-items: center;
     margin-top: 15px;
-    flex-wrap: wrap; /* Garante que os botões se ajustem em telas menores */
-    justify-content: flex-start; /* Alinha os botões à esquerda do card */
+    flex-wrap: wrap;
+    justify-content: flex-start;
 }
-
-/* Ajusta o botão principal de entrar */
 #btnLogin {
-    flex-grow: 1; /* Permite que o botão de Entrar cresça mais */
+    flex-grow: 1;
     min-width: 100px;
     padding: 10px 15px;
 }
-
-/* Ajusta os botões secundários */
 .login-buttons .button.ghost {
     flex-grow: 0;
     white-space: nowrap;
     padding: 10px 15px;
 }
-
 .login-buttons .button.ghost.small {
-    /* O botão de "Esqueci a senha" deve ser menor e mais discreto */
     font-size: 13px;
     text-decoration: underline;
     border: none;
     padding: 10px 0;
-    margin-left: auto; /* Move para a direita (opcional, dependendo do layout desejado) */
+    margin-left: auto;
 }
-
 .login-buttons .button.ghost.small:hover {
     background: transparent;
     color: var(--danger);
     transform: none;
+}
+
+/* Pequenos ajustes visuais (sombras ao hover) */
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
 }
