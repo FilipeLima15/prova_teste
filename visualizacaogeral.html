@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualização Geral de Afastamentos</title>
+    <style>
+        /* Paleta de Cores sugerida:
+           --primary-blue: #007bff;
+           --secondary-gray: #6c757d;
+           --light-gray-bg: #f8f9fa;
+           --border-color: #dee2e6;
+           --text-color: #343a40;
+           --admin-bg: #fff3cd; (Laranja Claro - mesmo anterior)
+           --admin-text: #664d03; (Laranja Escuro - mesmo anterior)
+           --sessao-bg: #e0f7fa; (Azul Claro - mesmo anterior)
+           --sessao-text: #005662; (Azul Escuro - mesmo anterior)
+           --f-bg: #e0f7fa;
+           --f-text: #7b9fc6;
+           --oae-bg: #fff3cd;
+           --oae-text: #664d03;
+           --lm-bg: #fde0e0;
+           --lm-text: #b71c1c;
+           --npj-bg: #e0e0e0;
+           --npj-text: #2fac7c;
+           --highlight-col: #fffacd;
+        */
+
+        /* --- (NOVO) Estilo para colunas de Fim de Semana --- */
+        .weekend-col {
+            background-color: #f5f5f5 !important;
+            /* Cinza bem claro */
+            color: #b71c1c !important;
+            /* (MODIFICADO) Vermelho escuro */
+        }
+
+        /* (NOVO) Estilo para colunas de Feriado */
+        .holiday-col {
+            background-color: #f5f5f5 !important;
+            /* Cinza bem claro */
+            color: #b71c1c !important;
+            /* (MODIFICADO) Vermelho escuro */
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+                Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+            background-color: #eef2f7;
+            /* Um cinza mais suave para o fundo */
+            color: #343a40;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        h1 {
+            color: #007bff;
+            font-size: 2em;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        #auth-loading,
+        #auth-error {
+            text-align: center;
+            padding: 50px;
+            font-size: 1.2em;
+        }
+
+        #auth-error {
+            color: #dc3545;
+            display: none;
+        }
+
+        #app-content {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            /* Permite quebrar linha em telas menores */
+            gap: 15px;
+            margin-bottom: 25px;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            /* Sombra mais suave */
+            align-items: center;
+            justify-content: center;
+            /* Centraliza os controles */
+        }
+
+        .controls label {
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .controls select,
+        .controls input[type="number"] {
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 1em;
+            color: #495057;
+            background-color: #fff;
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            min-width: 120px;
+        }
+
+        .controls select:focus,
+        .controls input[type="number"]:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, .25);
+        }
+
+        .month-nav-btn {
+            background-color: #007bff;
+            /* Azul primário */
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 15px;
+            font-size: 1.1em;
+            font-weight: 600;
+            line-height: 1;
+            cursor: pointer;
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+            height: 40px;
+            box-sizing: border-box;
+        }
+
+        .month-nav-btn:hover {
+            background-color: #0056b3;
+            /* Azul mais escuro no hover */
+            transform: translateY(-1px);
+        }
+
+        .month-nav-btn:active {
+            transform: translateY(0);
+        }
+
+        .year-label {
+            margin-left: 15px;
+        }
+
+        /* (NOVO) Estilo para o container do checkbox */
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 20px;
+            /* Espaçamento */
+            user-select: none;
+            /* Impede seleção do label */
+        }
+
+        .checkbox-container label {
+            font-weight: 500;
+            /* Mais leve que os outros labels */
+            color: #343a40;
+            cursor: pointer;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+
+        .calendar-container {
+            overflow-x: auto;
+            background-color: #ffffff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
+            padding: 10px;
+            /* Adiciona um pequeno padding interno */
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+            /* Garante que a tabela use 100% da largura do container */
+        }
+
+        th,
+        td {
+            border: 1px solid #e9ecef;
+            /* Borda mais suave */
+            padding: 10px 5px;
+            text-align: center;
+            min-width: 40px;
+            /* Largura mínima das células de dia */
+            box-sizing: border-box;
+            /* Garante que padding e borda sejam incluídos na largura */
+            /* (IMPORTANTE) Impede a seleção de texto nos dias e nomes */
+            user-select: none;
+            -webkit-user-select: none;
+            /* Safari */
+            -moz-user-select: none;
+            /* Firefox */
+            -ms-user-select: none;
+            /* IE10+ */
+        }
+
+        th {
+            background-color: #f2f2f2;
+            /* Cinza claro para cabeçalhos de dia */
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #555;
+            padding: 12px 5px;
+
+            /* (REMOVIDO) Removemos o 'position: sticky' daqui */
+        }
+
+        /* Coluna de nome PADRÃO */
+        th:first-child,
+        td:first-child {
+            position: sticky;
+            left: 0;
+            background-color: #fdfdfd;
+            width: 350px;
+            text-align: left;
+            font-weight: 600;
+            z-index: 1;
+            padding-left: 15px;
+        }
+
+        /* (NOVO) Cabeçalho do canto superior esquerdo (precisa de z-index alto) */
+        thead th:first-child {
+            z-index: 3;
+            background-color: #f2f2f2;
+            /* Garante o fundo */
+        }
+
+        td.sigla {
+            font-weight: 700;
+            font-size: 0.85em;
+        }
+
+        td.sigla-f {
+            background-color: #e0f7fa;
+            /* Azul claro */
+            color: #7b9fc6;
+        }
+
+        td.sigla-oae {
+            background-color: #fff3cd;
+            /* Amarelo claro */
+            color: #664d03;
+        }
+
+        td.sigla-lm {
+            background-color: #fde0e0;
+            /* Vermelho claro */
+            color: #b71c1c;
+        }
+
+        td.sigla-npj {
+            background-color: #e0e0e0;
+            /* Cinza claro */
+            color: #2fac7c;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px;
+            font-size: 1.1em;
+            color: #6c757d;
+        }
+
+        /* -- CSS PARA GRUPOS -- */
+        .group-header-row {
+            font-size: 1.1em;
+            font-weight: 700;
+        }
+
+        .group-header-row th {
+            background-color: #e8e8e8;
+            color: #343a40;
+            padding: 15px 15px;
+            text-align: left;
+            grid-column: 1 / -1;
+            position: sticky;
+            top: 0;
+            /* Título do grupo ainda fica fixo no topo */
+            z-index: 2;
+            /* Fica acima da coluna de nome */
+            border-bottom: 2px solid #ced4da;
+        }
+
+
+
+        /* Cores dos Grupos Específicos (AGORA SEPARADOS) */
+        .group-header-row.group-admin-server th {
+            background-color: #ffe89e;
+            color: #664d03;
+            border-color: #ffeeba;
+        }
+
+        td.name-admin-server {
+            background-color: #ffe89e;
+            color: #664d03;
+            font-weight: 600;
+        }
+
+
+        .group-header-row.group-admin-intern th {
+            background-color: #fdfde0;
+            /* Amarelo Bem Claro */
+            color: #646244;
+            border-color: #fcfcbe;
+        }
+
+        td.name-admin-intern {
+            background-color: #fdfde0;
+            /* Amarelo super claro */
+            color: #646244;
+            font-weight: 600;
+        }
+
+
+        .group-header-row.group-sessao-server th {
+            background-color: #d4e2fb;
+            color: #005662;
+            border-color: #b8daff;
+        }
+
+        td.name-sessao-server {
+            background-color: #d4e2fb;
+            color: #005662;
+            font-weight: 600;
+        }
+
+
+        .group-header-row.group-sessao-intern th {
+            background-color: #e6f7ff;
+            /* Ciano Bem Claro */
+            color: #00524c;
+            border-color: #cffff3;
+        }
+
+        td.name-sessao-intern {
+            background-color: #e6f7ff;
+            /* Ciano super claro */
+            color: #00524c;
+            font-weight: 600;
+        }
+
+
+
+
+        /* --- CSS PARA LINHA DE ESPAÇAMENTO --- */
+        .spacer-row td {
+            border: none;
+            padding: 8px !important;
+            background-color: transparent !important;
+            position: static;
+        }
+
+        /* -- CSS PARA DESTAQUE DE COLUNA -- */
+        .highlighted-col {
+            background-color: #e2ff78 !important;
+            /* Sua cor de destaque */
+        }
+
+        td:first-child.highlighted-col {
+            background-color: #d1ecf1 !important;
+        }
+
+        /* ================================================= */
+        /* --- (NOVO) CSS PARA O CABEÇALHO FLUTUANTE --- */
+        /* ================================================= */
+        #floating-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            /* Ocupa a largura da tela */
+            z-index: 1000;
+            /* Fica no topo de tudo */
+            display: none;
+            /* Começa escondido */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            /* Este container não rola */
+        }
+
+        #floating-header table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            /* A largura será definida via JS para bater com a tabela original */
+        }
+
+        #floating-header th {
+            /* Copia estilos do 'th' original */
+            background-color: #f2f2f2;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #555;
+            padding: 12px 5px;
+            border: 1px solid #e9ecef;
+            text-align: center;
+            min-width: 40px;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        #floating-header th:first-child {
+            /* Copia estilos do 'th:first-child' original */
+            width: 350px;
+            text-align: center;
+            /* <-- ALTERADO para centralizar */
+            padding-left: 10px;
+            /* Ajustado */
+            padding-right: 10x;
+            /* Adicionado */
+            font-size: 1.1em;
+            /* <-- ADICIONADO (deixa o texto maior) */
+            font-weight: 700;
+            /* <-- ADICIONADO (deixa em negrito) */
+            color: #007bff;
+            /* <-- ADICIONADO (cor primária) */
+        }
+
+        /* ================================================= */
+
+        /* Melhoria para responsividade em telas muito pequenas */
+        @media (max-width: 768px) {
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .controls select,
+            .controls input[type="number"] {
+                width: 100%;
+                min-width: unset;
+            }
+
+            .year-label {
+                margin-left: 0;
+            }
+
+            .month-nav-btn {
+                width: 100%;
+            }
+
+            .checkbox-container {
+                margin-left: 0;
+                padding: 10px 0;
+                justify-content: center;
+            }
+        }
+
+
+        /* ================================================= */
+        /* --- (NOVO) CSS para Menu de Contexto e Modais --- */
+        /* ================================================= */
+
+        /* --- O Menu de Contexto (clique direito) --- */
+        .context-menu {
+            display: none;
+            position: absolute;
+            z-index: 2000;
+            background-color: #ffffff;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            list-style: none;
+            padding: 8px 0;
+            margin: 0;
+            min-width: 220px;
+        }
+
+        .context-menu li {
+            padding: 10px 15px;
+            font-size: 0.95em;
+            color: #343a40;
+            cursor: pointer;
+        }
+
+        .context-menu li:hover {
+            background-color: #f8f9fa;
+        }
+
+        .context-menu .divider {
+            border-top: 1px solid #e9ecef;
+            margin: 5px 0;
+        }
+
+        /* --- O Fundo (Overlay) do Modal --- */
+        .modal-overlay {
+            display: none;
+            /* Oculto por padrão */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            z-index: 3000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Classe 'show' que o JS vai usar para exibir */
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        /* --- O Conteúdo do Modal --- */
+        .modal-content {
+            background-color: #ffffff;
+            padding: 25px 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2em;
+            color: #aaa;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            color: #007bff;
+        }
+
+        /* --- Estilos dos Formulários do Modal --- */
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #495057;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="date"],
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            font-size: 1em;
+            color: #495057;
+            box-sizing: border-box;
+            /* Garante que o padding não estoure a largura */
+        }
+
+        .form-group input[type="text"]:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        /* --- Botões do Modal --- */
+        .modal-actions {
+            margin-top: 25px;
+            text-align: right;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        /* Botões simples */
+        .btn {
+            padding: 10px 18px;
+            font-size: 1em;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+</head>
+
+<body>
+
+    <div id="auth-loading">Verificando autenticação...</div>
+    <div id="auth-error">
+        Erro: Você precisa estar logado no sistema principal para acessar esta página.
+    </div>
+
+    <div id="app-content">
+        <h1>Visualização Geral de Afastamentos</h1>
+
+        <div class="controls">
+            <label for="month-select">Mês:</label>
+            <button id="prev-month-btn" class="month-nav-btn">&lt;</button>
+            <select id="month-select"></select>
+            <button id="next-month-btn" class="month-nav-btn">&gt;</button>
+
+            <label for="year-select" class="year-label">Ano:</label>
+            <input type="number" id="year-select" value="">
+
+            <div class="checkbox-container">
+                <input type="checkbox" id="show-all-toggle">
+                <label for="show-all-toggle">Exibir lista completa</label>
+            </div>
+
+        </div>
+
+        <div id="floating-header"></div>
+
+        <div class="calendar-container" id="calendar-container">
+        </div>
+    </div>
+
+    <ul id="custom-context-menu" class="context-menu">
+        <li data-action="alterar">Alterar período de afastamento</li>
+        <li class="divider"></li>
+        <li data-action="adicionar">Adicionar novo período</li>
+    </ul>
+
+    <div id="modal-alterar" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" data-modal-id="modal-alterar">&times;</span>
+            <h2>Alterar Período de Afastamento</h2>
+
+            <input type="hidden" id="alterar-person-id">
+            <input type="hidden" id="alterar-absence-key">
+            <input type="hidden" id="alterar-absence-type-node">
+
+            <div class="form-group">
+                <label for="alterar-nome">Membro:</label>
+                <input type="text" id="alterar-nome" disabled>
+            </div>
+            <div class="form-group">
+                <label for="alterar-tipo">Tipo:</label>
+                <input type="text" id="alterar-tipo" disabled>
+            </div>
+            <div class="form-group">
+                <label for="alterar-data-inicio">Data de Início:</label>
+                <input type="date" id="alterar-data-inicio">
+            </div>
+            <div class="form-group">
+                <label for="alterar-data-fim">Data de Fim:</label>
+                <input type="date" id="alterar-data-fim">
+            </div>
+            <div class="modal-actions">
+                <button id="btn-salvar-alteracao" class="btn btn-primary">Salvar Alterações</button>
+                <button class="btn btn-secondary modal-close" data-modal-id="modal-alterar">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-adicionar" class="modal-overlay">
+        <div class="modal-content">
+            <span class="modal-close" data-modal-id="modal-adicionar">&times;</span>
+            <h2>Adicionar Novo Afastamento</h2>
+
+            <div class="form-group">
+                <label for="add-nome">Membro da Equipe:</label>
+                <select id="add-nome">
+                    <option value="">Selecione um membro...</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="add-tipo">Tipo de Afastamento:</label>
+                <select id="add-tipo">
+                    <option value="vacations">Férias (F)</option>
+                    <option value="medicalLeaves">Licença Médica (LM)</option>
+                    <option value="oaeAbsences">OAE</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="add-data-inicio">Data de Início:</label>
+                <input type="date" id="add-data-inicio">
+            </div>
+            <div class="form-group">
+                <label for="add-data-fim">Data de Fim:</label>
+                <input type="date" id="add-data-fim">
+            </div>
+            <div class="modal-actions">
+                <button id="btn-adicionar" class="btn btn-primary">Adicionar Afastamento</button>
+                <button class="btn btn-secondary modal-close" data-modal-id="modal-adicionar">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAqiu15IVDPZ2gQORplVy0Q1m85Swy0hzQ",
+            authDomain: "prova-teste-5fe84.firebaseapp.com",
+            databaseURL: "https://prova-teste-5fe84-default-rtdb.firebaseio.com",
+            projectId: "prova-teste-5fe84",
+            storageBucket: "prova-teste-5fe84.firebasestorage.app",
+            messagingSenderId: "443315928347",
+            appId: "1:443315928347:web:64e80177b91f7cea4a67be"
+        };
+
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+
+        const authLoadingEl = document.getElementById('auth-loading');
+        const authErrorEl = document.getElementById('auth-error');
+        const appContentEl = document.getElementById('app-content');
+        const monthSelect = document.getElementById('month-select');
+        const yearSelect = document.getElementById('year-select');
+        const calendarContainer = document.getElementById('calendar-container');
+        let lastClickedColIndex = -1;
+
+        let isDragging = false;
+        let dragStartColIndex = -1;
+        let justDragged = false;
+
+        const floaterDiv = document.getElementById('floating-header');
+        let mainThead = null;
+        let mainTable = null;
+
+        // (NOVAS) Variáveis para os Modais e Menu de Contexto
+        let contextMenu = null;
+        let modalAlterar = null;
+        let modalAdicionar = null;
+        let currentPeopleList = []; // Para popular o dropdown
+        let clickedAbsenceContext = {}; // Guarda os dados do clique
+
+        // (MOVIMOVIMENTO) Função movida para o escopo global
+        function clearAllHighlights() {
+            // Adicionamos verificações para segurança
+            if (mainTable) {
+                mainTable.querySelectorAll('.highlighted-col').forEach(cell => {
+                    cell.classList.remove('highlighted-col');
+                });
+            }
+            if (floaterDiv) {
+                floaterDiv.querySelectorAll('.highlighted-col').forEach(cell => {
+                    cell.classList.remove('highlighted-col');
+                });
+            }
+        }
+
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                authLoadingEl.style.display = 'none';
+                appContentEl.style.display = 'block';
+                initializeControls();
+            } else {
+                authLoadingEl.style.display = 'none';
+                authErrorEl.style.display = 'block';
+            }
+        });
+
+        function initializeControls() {
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth();
+            const meses = [
+                "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+                "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+            ];
+            meses.forEach((mes, index) => {
+                const option = document.createElement('option');
+                option.value = index;
+                option.textContent = mes;
+                monthSelect.appendChild(option);
+            });
+            monthSelect.value = currentMonth;
+            yearSelect.value = currentYear;
+
+            document.getElementById('prev-month-btn').addEventListener('click', () => changeMonth(-1));
+            document.getElementById('next-month-btn').addEventListener('click', () => changeMonth(1));
+            monthSelect.addEventListener('change', loadCalendarData);
+            yearSelect.addEventListener('change', loadCalendarData);
+
+            document.getElementById('show-all-toggle').addEventListener('change', loadCalendarData);
+
+            window.addEventListener('scroll', () => {
+                if (!mainTable || !mainThead) return;
+
+                const containerRect = calendarContainer.getBoundingClientRect();
+                const theadRect = mainThead.getBoundingClientRect();
+
+                const groupHeaderTop = containerRect.top;
+
+                if (groupHeaderTop < 0 && theadRect.top < 0) {
+                    floaterDiv.style.display = 'block';
+                    floaterDiv.style.left = (containerRect.left + 10) + 'px';
+                    floaterDiv.style.right = (document.documentElement.clientWidth - containerRect.right) + 'px';
+                } else {
+                    floaterDiv.style.display = 'none';
+                }
+            });
+
+            calendarContainer.addEventListener('scroll', () => {
+                const floaterTable = floaterDiv.querySelector('table');
+                if (floaterTable) {
+                    floaterTable.style.marginLeft = -calendarContainer.scrollLeft + 'px';
+                }
+            });
+
+            document.addEventListener('click', (event) => {
+
+                if (justDragged) {
+                    justDragged = false;
+                    return;
+                }
+
+                const clickedHeader = event.target.closest('th');
+                const clickedInsideTable = event.target.closest('#calendar-container, #floating-header');
+
+                if (clickedHeader && clickedHeader.cellIndex > 0) {
+                    return;
+                }
+
+                clearAllHighlights();
+                lastClickedColIndex = -1;
+
+                // Esconde o menu de contexto se clicar fora dele
+                if (contextMenu && !event.target.closest('.context-menu')) {
+                    contextMenu.style.display = 'none';
+                }
+
+            }, true);
+
+            document.addEventListener('selectstart', (event) => {
+                if (isDragging) {
+                    event.preventDefault();
+                }
+            });
+
+            // ==========================================================
+            // --- (CORRIGIDO) Listeners de Modais e Menu ---
+            // ==========================================================
+
+            // (REMOVIDO) O listener de 'contextmenu' do 'document' foi removido
+            // para corrigir o conflito.
+
+            // (MANTIDO) Este é o único listener de clique direito necessário.
+            // Ele agora vai pegar TODOS os cliques direitos dentro do 'calendarContainer'.
+            calendarContainer.addEventListener('contextmenu', handleRightClick);
+
+            // Pega a referência dos novos elementos
+            contextMenu = document.getElementById('custom-context-menu');
+            modalAlterar = document.getElementById('modal-alterar');
+            modalAdicionar = document.getElementById('modal-adicionar');
+
+            // Listener para ações do menu (Alterar / Adicionar)
+            contextMenu.addEventListener('click', (event) => {
+                const action = event.target.dataset.action;
+                if (action === 'alterar') {
+                    openAlterarModal();
+                } else if (action === 'adicionar') {
+                    openAdicionarModal();
+                }
+                contextMenu.style.display = 'none'; // Esconde o menu após clicar
+            });
+
+            // Listeners para fechar os modais (nos botões 'X' e 'Cancelar')
+            document.querySelectorAll('.modal-close').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const modalId = btn.dataset.modalId;
+                    closeModal(modalId);
+                });
+            });
+
+            // Listener para fechar o modal clicando no fundo (overlay)
+            document.querySelectorAll('.modal-overlay').forEach(overlay => {
+                overlay.addEventListener('click', (event) => {
+                    // Fecha só se clicar no próprio overlay, não no conteúdo
+                    if (event.target === overlay) {
+                        closeModal(overlay.id);
+                    }
+                });
+            });
+
+            // Listeners para os botões de Salvar
+            document.getElementById('btn-salvar-alteracao').addEventListener('click', saveAlteracao);
+            document.getElementById('btn-adicionar').addEventListener('click', saveAdicionar);
+
+            loadCalendarData();
+        }
+
+        function changeMonth(delta) {
+            let currentMonth = parseInt(monthSelect.value);
+            let currentYear = parseInt(yearSelect.value);
+            currentMonth += delta;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            } else if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            monthSelect.value = currentMonth;
+            yearSelect.value = currentYear;
+            loadCalendarData();
+        }
+
+        function showLoadingSpinner() {
+            calendarContainer.innerHTML = '<div class="loading-spinner">Carregando dados...</div>';
+
+            mainTable = null;
+            mainThead = null;
+            floaterDiv.style.display = 'none';
+        }
+
+        async function loadCalendarData() {
+            const year = parseInt(yearSelect.value);
+            const month = parseInt(monthSelect.value);
+            showLoadingSpinner();
+
+            // (MODIFICADO) Prepara o caminho para os feriados
+            const monthString = (month + 1).toString().padStart(2, '0');
+            const currentHolidaysRef = database.ref(`appState/holidays/${year}/${monthString}`);
+
+            try {
+                const internRef = database.ref('appState/interns');
+                const serverRef = database.ref('appState/servers');
+
+                // (MODIFICADO) Adiciona a busca de feriados ao Promise.all
+                const [internSnap, serverSnap, holidaySnap] = await Promise.all([
+                    internRef.once('value'),
+                    serverRef.once('value'),
+                    currentHolidaysRef.once('value') // <-- NOVO
+                ]);
+
+                const allInterns = internSnap.val() || {};
+                const allServers = serverSnap.val() || {};
+                const holidaysData = holidaySnap.val() || {}; // <-- NOVO
+
+                let peopleList = [];
+                for (const id in allInterns) {
+                    peopleList.push({ ...allInterns[id], id: id, role: 'intern' });
+                }
+                for (const id in allServers) {
+                    peopleList.push({ ...allServers[id], id: id, role: 'server' });
+                }
+
+                // (NOVO) Salva a lista na variável global para os modais
+                currentPeopleList = peopleList;
+
+                if (peopleList.length === 0) {
+                    calendarContainer.innerHTML = "<p>Nenhum membro encontrado.</p>";
+                    return;
+                }
+
+                peopleList.sort((a, b) => {
+                    const valA = getSortValue(a);
+                    const valB = getSortValue(b);
+                    if (valA !== valB) {
+                        return valA - valB;
+                    }
+                    return (a.name || '').localeCompare(b.name || '');
+                });
+
+                const processedData = processAfastamentos(peopleList, year, month);
+
+                // (MODIFICADO) Passa os dados de feriado para o renderizador
+                renderCalendar(year, month, processedData, peopleList, holidaysData);
+
+            } catch (error) {
+                console.error("Erro ao buscar dados do Firebase:", error);
+                calendarContainer.innerHTML = `<p style="color: red;">Erro ao carregar dados: ${error.message}</p>`;
+            }
+        }
+
+        function getSortValue(person) {
+            const team = person.subType;
+            const role = person.role;
+
+            if (team === 'administrativo' && role === 'server') return 1;
+            if (team === 'administrativo' && role === 'intern') return 2;
+            if (team === 'sessao' && role === 'server') return 3;
+            if (team === 'sessao' && role === 'intern') return 4;
+
+            return 5;
+        }
+
+        function processAfastamentos(peopleList, year, month) {
+            const processedData = {};
+            for (const person of peopleList) {
+                const nome = person.name;
+                if (nome) {
+                    processLeave_WithStatus(person.vacations, "F", processedData, nome, year, month);
+                    processLeave_SpecificDates(person.medicalLeaves, "LM", processedData, nome, year, month);
+                    processLeave_SpecificDates(person.oaeAbsences, "OAE", processedData, nome, year, month);
+                    processLeave_SpecificDates(person.npjAbsences, "NPJ", processedData, nome, year, month);
+                }
+            }
+            return processedData;
+        }
+
+        function calculateEndDate(startDateStr, durationDays) {
+            const date = new Date(startDateStr + "T00:00:00");
+            date.setDate(date.getDate() + (parseInt(durationDays) - 1));
+            return date;
+        }
+
+        function processLeave_WithStatus(nodeData, sigla, processedData, nome, year, month) {
+            if (!nodeData) return;
+            const startDateOfMonth = new Date(year, month, 1);
+            const endDateOfMonth = new Date(year, month + 1, 0);
+            for (const key in nodeData) {
+                const leave = nodeData[key];
+                if (typeof leave === 'object' && leave !== null && leave.status === 'approved' && leave.startDate && leave.days) {
+                    const dataInicio = new Date(leave.startDate + "T00:00:00");
+                    const dataFim = calculateEndDate(leave.startDate, leave.days);
+                    if (dataInicio <= endDateOfMonth && dataFim >= startDateOfMonth) {
+                        if (!processedData[nome]) processedData[nome] = {};
+                        let currentDate = new Date(dataInicio);
+                        while (currentDate <= dataFim) {
+                            if (currentDate.getFullYear() === year && currentDate.getMonth() === month) {
+                                const dayOfMonth = currentDate.getDate();
+                                processedData[nome][dayOfMonth] = sigla;
+                            }
+                            currentDate.setDate(currentDate.getDate() + 1);
+                        }
+                    }
+                }
+            }
+        }
+
+        function processLeave_SpecificDates(nodeData, sigla, processedData, nome, year, month) {
+            if (!nodeData) return;
+            for (const key in nodeData) {
+                const leave = nodeData[key];
+                if (typeof leave === 'object' && leave !== null && leave.dates) {
+                    const specificDates = leave.dates;
+                    for (const dateKey in specificDates) {
+                        const dateStr = specificDates[dateKey];
+                        const absenceDate = new Date(dateStr + "T00:00:00");
+                        if (absenceDate.getFullYear() === year && absenceDate.getMonth() === month) {
+                            if (!processedData[nome]) processedData[nome] = {};
+                            const dayOfMonth = absenceDate.getDate();
+                            processedData[nome][dayOfMonth] = sigla;
+                        }
+                    }
+                }
+            }
+        }
+
+        function getSiglaClass(sigla) {
+            switch (sigla) {
+                case 'F': return 'sigla sigla-f';
+                case 'OAE': return 'sigla sigla-oae';
+                case 'LM': return 'sigla sigla-lm';
+                case 'NPJ': return 'sigla sigla-npj';
+                default: return sigla ? 'sigla' : '';
+            }
+        }
+
+        // (MODIFICADO) Adiciona 'holidaysData' como último parâmetro
+        function renderCalendar(year, month, data, peopleList, holidaysData) {
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            const showAll = document.getElementById('show-all-toggle').checked;
+
+            const weekdays = ["DO", "S", "T", "Q", "Q", "S", "SA"];
+
+            if (peopleList.length === 0) {
+                calendarContainer.innerHTML = "<p>Nenhum membro registrado para este mês.</p>";
+                return;
+            }
+
+            const totalColumns = daysInMonth + 1;
+
+            let html = '<table>';
+
+            // ... (A criação do <thead> continua igual) ...
+            html += '<thead>';
+            // Linha 1: Números dos Dias
+            html += '<tr class="day-number-row">';
+            html += '<th></th>';
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayOfWeek = new Date(year, month, day).getDay();
+
+                const dayString = day.toString().padStart(2, '0');
+                const isHoliday = holidaysData[dayString] === true;
+
+                const weekendClass = (dayOfWeek === 0 || dayOfWeek === 6) ? 'weekend-col' : '';
+                const holidayClass = isHoliday ? 'holiday-col' : '';
+
+                html += `<th class="${weekendClass} ${holidayClass}">${day}</th>`;
+            }
+            html += '</tr>';
+
+            // Linha 2: Siglas dos Dias da Semana
+            html += '<tr class="weekday-row">';
+            html += '<th></th>';
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayOfWeek = new Date(year, month, day).getDay();
+
+                const dayString = day.toString().padStart(2, '0');
+                const isHoliday = holidaysData[dayString] === true;
+
+                const weekendClass = (dayOfWeek === 0 || dayOfWeek === 6) ? 'weekend-col' : '';
+                const holidayClass = isHoliday ? 'holiday-col' : '';
+
+                const dayText = isHoliday ? 'FR' : weekdays[dayOfWeek];
+
+                html += `<th class="${weekendClass} ${holidayClass}" data-day="${day}">${dayText}</th>`;
+            }
+            html += '</tr>';
+            html += '</thead>';
+            // ==================================================
+
+            // ... (A criação do <tbody> continua igual) ...
+            html += '<tbody>';
+
+            let currentGroupValue = -1;
+            let currentNameClass = "";
+
+            for (const person of peopleList) {
+                // ... (lógica de 'person' e 'groupValue' igual) ...
+                const name = person.name;
+                if (!name) continue;
+
+                const personDays = data[name] || {};
+
+                if (!showAll && Object.keys(personDays).length === 0) {
+                    continue;
+                }
+
+                const groupValue = getSortValue(person);
+
+                if (groupValue !== currentGroupValue) {
+                    // ... (lógica de 'group-header-row' igual) ...
+                    currentGroupValue = groupValue;
+
+                    let groupName = "Outros";
+                    let groupClass = "group-outros";
+
+                    currentNameClass = "";
+
+                    if (groupValue === 1) {
+                        groupName = "Administrativo (Cartório e Gabinete) - Servidores";
+                        groupClass = "group-admin-server";
+                        currentNameClass = "name-admin-server";
+                    } else if (groupValue === 2) {
+                        groupName = "Administrativo (Cartório e Gabinete) - Estagiários";
+                        groupClass = "group-admin-intern";
+                        currentNameClass = "name-admin-intern";
+                    } else if (groupValue === 3) {
+                        groupName = "Sessão (Mediadores e Apoio) - Servidores";
+                        groupClass = "group-sessao-server";
+                        currentNameClass = "name-sessao-server";
+                    } else if (groupValue === 4) {
+                        groupName = "Sessão (Conciliadores e Apoio) - Estagiários";
+                        groupClass = "group-sessao-intern";
+                        currentNameClass = "name-sessao-intern";
+                    }
+
+                    if (html.includes('group-header-row')) {
+                        html += `<tr class="spacer-row"><td colspan="${totalColumns}"></td></tr>`;
+                    }
+
+                    html += `<tr class="group-header-row ${groupClass}">`;
+                    html += `<th colspan="${totalColumns}">${groupName}</th>`;
+                    html += `</tr>`;
+
+                    html += `<tr class="spacer-row"><td colspan="${totalColumns}"></td></tr>`;
+                }
+
+                // (MODIFICADO) Adiciona data-attributes na linha <tr> para o clique direito
+                html += `<tr data-person-id="${person.id}" data-person-role="${person.role}">`;
+                html += `<td class="${currentNameClass}">${name}</td>`;
+
+                for (let day = 1; day <= daysInMonth; day++) {
+                    // ... (lógica de 'weekendClass', 'holidayClass', 'sigla' igual) ...
+                    const dayOfWeek = new Date(year, month, day).getDay();
+                    const weekendClass = (dayOfWeek === 0 || dayOfWeek === 6) ? 'weekend-col' : '';
+
+                    const dayString = day.toString().padStart(2, '0');
+                    const isHoliday = holidaysData[dayString] === true;
+                    const holidayClass = isHoliday ? 'holiday-col' : '';
+
+                    const sigla = personDays[day] || "";
+                    const cellClass = getSiglaClass(sigla);
+
+                    // (MODIFICADO) Adiciona classe de feriado e data-day na célula <td>
+                    html += `<td class="${cellClass} ${weekendClass} ${holidayClass}" data-day="${day}">${sigla}</td>`;
+                }
+                html += '</tr>';
+            }
+            html += '</tbody>';
+            html += '</table>';
+
+            calendarContainer.innerHTML = html;
+
+
+            mainTable = calendarContainer.querySelector('table');
+            if (!mainTable) return;
+
+            mainThead = mainTable.querySelector('thead');
+            if (!mainThead) return;
+
+            // ==========================================================
+            // --- (MODIFICADO) Listeners de Modal ---
+            // ==========================================================
+
+            // Popula o dropdown do modal "Adicionar"
+            populateAddModalDropdown();
+
+            // (REMOVIDO) O listener 'handleRightClick' foi movido para 'initializeControls'
+            // ==========================================================
+
+
+            // ==========================================================
+            // --- (MODIFICADO) Lógica de Clique para Feriado ---
+            // ==========================================================
+
+            // Cria uma função reutilizável para adicionar o listener
+            const addHolidayToggleListener = (theadElement) => {
+                // Seleciona apenas os cabeçalhos da linha de dias da semana (S, T, Q...)
+                theadElement.querySelectorAll('tr.weekday-row th[data-day]').forEach(th => {
+                    th.style.cursor = 'pointer'; // Mostra que é clicável
+
+                    th.addEventListener('click', async (event) => {
+                        // Se um "arrastar" de seleção de coluna acabou de acontecer, não faz nada
+                        if (justDragged) {
+                            return;
+                        }
+                        // Impede que o clique "vaze" para o document e limpe os highlights
+                        event.stopPropagation();
+
+                        const day = th.dataset.day;
+                        const dayString = day.padStart(2, '0');
+                        const monthString = (month + 1).toString().padStart(2, '0');
+
+                        // Referência exata do dia no Firebase
+                        const dayRef = database.ref(`appState/holidays/${year}/${monthString}/${dayString}`);
+
+                        // Inverte o estado atual
+                        const isCurrentlyHoliday = holidaysData[dayString] === true;
+                        const newHolidayState = !isCurrentlyHoliday;
+
+                        // ===========================================
+                        // --- (NOVO) Confirmação ---
+                        // ===========================================
+                        const actionText = isCurrentlyHoliday ? "remover o feriado" : "adicionar um feriado";
+                        if (!confirm(`Tem certeza que deseja ${actionText} para o dia ${day}?`)) {
+                            return; // Cancela a ação se o usuário clicar em "Cancelar"
+                        }
+                        // --- Fim da Confirmação ---
+                        // ===========================================
+
+
+                        try {
+                            // Desativa o clique e dá feedback visual em AMBOS os cabeçalhos (o original e o flutuante)
+                            const allHeaders = document.querySelectorAll(`th[data-day="${day}"]`);
+                            allHeaders.forEach(header => {
+                                header.style.pointerEvents = 'none';
+                                header.textContent = '...';
+                                header.style.cursor = 'wait';
+                            });
+
+                            if (newHolidayState === true) {
+                                // Salva 'true' no Firebase
+                                await dayRef.set(true);
+                            } else {
+                                // Remove o nó do Firebase
+                                await dayRef.remove();
+                            }
+
+                            // Sucesso! Recarrega o calendário para todos verem a mudança.
+                            loadCalendarData();
+
+                        } catch (error) {
+                            console.error("Erro ao salvar feriado:", error);
+                            alert("Não foi possível salvar a alteração. Tente novamente.");
+                            // Recarrega de qualquer forma para reverter o '...'
+                            loadCalendarData();
+                        }
+                    });
+                });
+            }
+
+            // Adiciona o listener ao cabeçalho principal (o que fica na tabela)
+            addHolidayToggleListener(mainThead);
+
+            // --- FIM: Lógica de Clique para Feriado ---
+            // ==========================================================
+
+
+            // ... (A lógica do Cabeçalho Flutuante continua igual) ...
+            const clonedThead = mainThead.cloneNode(true);
+            const monthName = monthSelect.options[monthSelect.selectedIndex].text;
+            // ... (etc.)
+            const floaterTable = document.createElement('table');
+            floaterTable.style.width = mainTable.offsetWidth + 'px';
+            floaterTable.appendChild(clonedThead);
+            floaterDiv.innerHTML = '';
+            floaterDiv.appendChild(floaterTable);
+            addHolidayToggleListener(clonedThead); // Adiciona listener ao flutuante
+
+
+            // ... (A lógica de Destaque de Coluna continua igual) ...
+            const dataRows = mainTable.querySelectorAll('tbody tr:not(.group-header-row):not(.spacer-row)');
+            if (dataRows.length === 0) {
+                // ...
+                return;
+            }
+            // ... (funções applyHighlight, applyHighlightRange, addHighlightListeners, etc.) ...
+            function applyHighlight(colIndex) {
+                if (colIndex < 1) return;
+
+                const mainHeaderCell = mainThead.querySelector(`tr:first-child th:nth-child(${colIndex + 1})`);
+                const mainWeekdayCell = mainThead.querySelector(`tr:last-child th:nth-child(${colIndex + 1})`);
+                if (mainHeaderCell) mainHeaderCell.classList.add('highlighted-col');
+                if (mainWeekdayCell) mainWeekdayCell.classList.add('highlighted-col');
+
+
+                const floaterHeaderCell = floaterDiv.querySelector(`tr:first-child th:nth-child(${colIndex + 1})`);
+                const floaterWeekdayCell = floaterDiv.querySelector(`tr:last-child th:nth-child(${colIndex + 1})`);
+                if (floaterHeaderCell) floaterHeaderCell.classList.add('highlighted-col');
+                if (floaterWeekdayCell) floaterWeekdayCell.classList.add('highlighted-col');
+
+                dataRows.forEach(row => {
+                    if (row.cells[colIndex]) {
+                        row.cells[colIndex].classList.add('highlighted-col');
+                    }
+                });
+            }
+            function applyHighlightRange(startIndex, endIndex) {
+                clearAllHighlights();
+                const start = Math.min(startIndex, endIndex);
+                const end = Math.max(startIndex, endIndex);
+                for (let i = start; i <= end; i++) {
+                    applyHighlight(i);
+                }
+            }
+            function addHighlightListeners(element) {
+                const cells = element.querySelectorAll('thead tr th');
+                cells.forEach((th) => {
+                    const colIndex = th.cellIndex;
+                    if (colIndex === 0) return;
+                    th.style.cursor = 'pointer';
+
+                    th.addEventListener('mousedown', (event) => {
+                        if (event.button !== 0) return;
+
+                        isDragging = true;
+                        justDragged = false;
+                        dragStartColIndex = colIndex;
+                        lastClickedColIndex = colIndex;
+
+                        clearAllHighlights();
+                        applyHighlight(colIndex);
+
+                        document.addEventListener('mouseup', onMouseUpGlobal, { once: true });
+                        mainThead.addEventListener('mouseover', onTableMouseOver);
+                        floaterDiv.addEventListener('mouseover', onTableMouseOver);
+                    });
+                });
+            }
+            addHighlightListeners(mainThead);
+            addHighlightListeners(floaterDiv);
+            function onTableMouseOver(event) {
+                if (!isDragging) return;
+                const targetCell = event.target.closest('th');
+                if (targetCell && targetCell.cellIndex > 0) {
+                    const currentHoverColIndex = targetCell.cellIndex;
+                    if (currentHoverColIndex !== lastClickedColIndex) {
+                        applyHighlightRange(dragStartColIndex, currentHoverColIndex);
+                        lastClickedColIndex = currentHoverColIndex;
+                        justDragged = true;
+                    }
+                }
+            }
+            function onMouseUpGlobal() {
+                isDragging = false;
+                if (mainThead) mainThead.removeEventListener('mouseover', onTableMouseOver);
+                floaterDiv.removeEventListener('mouseover', onTableMouseOver);
+            }
+        }
+
+        // ==========================================================
+        // --- (NOVAS) Funções para Modais e Gerenciamento
+        // ==========================================================
+
+        /**
+         * Popula o dropdown no modal "Adicionar" com a lista de membros.
+         */
+        function populateAddModalDropdown() {
+            const selectEl = document.getElementById('add-nome');
+            selectEl.innerHTML = '<option value="">Selecione um membro...</option>'; // Limpa
+
+            // Usa a lista global 'currentPeopleList'
+            currentPeopleList.forEach(person => {
+                // Salva o ID e a ROLE no 'value'
+                const option = document.createElement('option');
+                option.value = `${person.id}|${person.role}`;
+                option.textContent = person.name;
+                selectEl.appendChild(option);
+            });
+        }
+
+        /**
+         * (MODIFICADO) Lida com o clique direito em QUALQUER LUGAR do calendário.
+         */
+        function handleRightClick(event) {
+            // Previne o menu padrão em qualquer lugar do calendário
+            event.preventDefault();
+
+            // Tenta encontrar a célula de sigla
+            let targetCell = event.target.closest('td.sigla');
+
+            // (NOVO) Regra do NPJ: Se for NPJ, trata como se não fosse uma sigla
+            if (targetCell && targetCell.textContent === 'NPJ') {
+                targetCell = null;
+            }
+
+            // Tenta encontrar a linha da pessoa, independentemente de onde clicou
+            const tr = event.target.closest('tr[data-person-id]');
+            let person = null;
+            if (tr) {
+                person = currentPeopleList.find(p => p.id === tr.dataset.personId);
+            }
+
+            // Limpa o contexto e define a pessoa (se encontrada)
+            // 'Adicionar' vai usar isso para pré-selecionar o nome
+            clickedAbsenceContext = { person: person };
+
+            if (targetCell && person) {
+                // (Cenário 1) Clicou em uma sigla válida (F, LM, OAE)
+                const day = parseInt(targetCell.dataset.day);
+                const sigla = targetCell.textContent;
+
+                const absence = findAbsence(person, day, sigla);
+
+                if (absence) {
+                    // Achou! Salva o contexto completo e mostra 'Alterar'
+                    clickedAbsenceContext = {
+                        person: person,
+                        absenceKey: absence.key,
+                        absenceNode: absence.node,
+                        absenceData: absence.data
+                    };
+                    contextMenu.querySelector('li[data-action="alterar"]').style.display = 'block';
+                    contextMenu.querySelector('li.divider').style.display = 'block';
+                } else {
+                    // É uma sigla mas não achou o afastamento (raro, mas seguro)
+                    contextMenu.querySelector('li[data-action="alterar"]').style.display = 'none';
+                    contextMenu.querySelector('li.divider').style.display = 'none';
+                }
+
+            } else {
+                // (Cenário 2) Clicou em uma célula vazia, nome, ou NPJ
+                contextMenu.querySelector('li[data-action="alterar"]').style.display = 'none';
+                contextMenu.querySelector('li.divider').style.display = 'none';
+            }
+
+            // Mostra o menu (com as opções corretas) na posição do mouse
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = `${event.pageX}px`;
+            contextMenu.style.top = `${event.pageY}px`;
+        }
+
+        /**
+         * Procura o objeto de afastamento exato com base na pessoa, dia e sigla.
+         */
+        function findAbsence(person, day, sigla) {
+            const year = parseInt(yearSelect.value);
+            const month = parseInt(monthSelect.value);
+            const clickedDate = new Date(year, month, day);
+
+            let nodeToSearch = '';
+            if (sigla === 'F') nodeToSearch = 'vacations';
+            else if (sigla === 'LM') nodeToSearch = 'medicalLeaves';
+            else if (sigla === 'OAE') nodeToSearch = 'oaeAbsences';
+            else if (sigla === 'NPJ') {
+                // NPJ não é editável por este modal, então não o "encontramos"
+                return null;
+            }
+            else return null; // Sigla não gerenciável
+
+            const absenceDataNode = person[nodeToSearch];
+            if (!absenceDataNode) return null;
+
+            for (const key in absenceDataNode) {
+                const leave = absenceDataNode[key];
+
+                if (nodeToSearch === 'vacations') {
+                    // Lógica para Férias (baseado em range)
+                    if (leave.status === 'approved' && leave.startDate && leave.days) {
+                        const startDate = new Date(leave.startDate + "T00:00:00");
+                        const endDate = calculateEndDate(leave.startDate, leave.days);
+
+                        if (clickedDate >= startDate && clickedDate <= endDate) {
+                            return { key: key, node: nodeToSearch, data: leave };
+                        }
+                    }
+                } else {
+                    // Lógica para LM, OAE (baseado em datas específicas)
+                    if (leave.dates) {
+                        for (const dateKey in leave.dates) {
+                            const absenceDate = new Date(leave.dates[dateKey] + "T00:00:00");
+                            if (absenceDate.getTime() === clickedDate.getTime()) {
+                                // (MODIFICADO) ACHOU! Retorna o objeto encontrado para LM e OAE
+                                return { key: key, node: nodeToSearch, data: leave };
+                            }
+                        }
+                    }
+                }
+            }
+            return null; // Não encontrou
+        }
+
+
+        /**
+         * Abre um modal
+         */
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('show');
+            }
+        }
+
+        /**
+         * Fecha um modal
+         */
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+            }
+        }
+
+        /**
+         * Preenche e abre o modal "Alterar"
+         */
+        function openAlterarModal() {
+            const ctx = clickedAbsenceContext;
+            if (!ctx.absenceData) {
+                alert("Erro: Não foi possível carregar os dados do afastamento.");
+                return;
+            }
+
+            let startDate, endDate, tipo;
+
+            if (ctx.absenceNode === 'vacations') {
+                // Lógica de Férias (existente)
+                startDate = ctx.absenceData.startDate;
+                endDate = calculateEndDate(startDate, ctx.absenceData.days).toISOString().split('T')[0];
+                tipo = "Férias (F)";
+
+            } else if (ctx.absenceData.dates) {
+                // (NOVO) Lógica para LM, OAE (array de datas)
+
+                // Converte o objeto/array de datas para datas reais
+                // Object.values() garante que funcione se for um array [0: "...", 1: "..."] ou objeto
+                const dateObjects = Object.values(ctx.absenceData.dates).map(d => new Date(d + "T00:00:00"));
+
+                // Encontra a data de início (mínima) e fim (máxima) do array
+                const minDate = new Date(Math.min.apply(null, dateObjects));
+                const maxDate = new Date(Math.max.apply(null, dateObjects));
+
+                startDate = minDate.toISOString().split('T')[0];
+                endDate = maxDate.toISOString().split('T')[0];
+
+                if (ctx.absenceNode === 'medicalLeaves') tipo = "Licença Médica (LM)";
+                else if (ctx.absenceNode === 'oaeAbsences') tipo = "OAE";
+                else tipo = "Outro"; // Fallback
+
+            } else {
+                alert("Erro: Formato de afastamento desconhecido.");
+                return;
+            }
+
+            // Preenche o formulário
+            document.getElementById('alterar-nome').value = ctx.person.name;
+            document.getElementById('alterar-tipo').value = tipo;
+            document.getElementById('alterar-data-inicio').value = startDate;
+            document.getElementById('alterar-data-fim').value = endDate;
+
+            openModal('modal-alterar');
+        }
+
+        /**
+         * Limpa e abre o modal "Adicionar"
+         */
+        function openAdicionarModal() {
+            // Limpa o formulário
+            document.getElementById('add-nome').value = "";
+            document.getElementById('add-tipo').value = "vacations";
+            document.getElementById('add-data-inicio').value = "";
+            document.getElementById('add-data-fim').value = "";
+
+            // Se o clique foi em uma pessoa, pré-seleciona ela
+            if (clickedAbsenceContext.person) {
+                const personId = clickedAbsenceContext.person.id;
+                const personRole = clickedAbsenceContext.person.role;
+                document.getElementById('add-nome').value = `${personId}|${personRole}`;
+            }
+
+            openModal('modal-adicionar');
+        }
+
+        /**
+         * Calcula a quantidade de dias entre duas datas (inclusivo)
+         */
+        function calculateDaysBetween(startDateStr, endDateStr) {
+            const start = new Date(startDateStr + "T00:00:00");
+            const end = new Date(endDateStr + "T00:00:00");
+            const diffTime = Math.abs(end - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays + 1; // +1 para incluir o dia de início
+        }
+
+        /**
+         * Gera um array de strings de datas (YYYY-MM-DD) num range
+         */
+        function getDatesInRange(startDateStr, endDateStr) {
+            const dates = [];
+            let currentDate = new Date(startDateStr + "T00:00:00");
+            const endDate = new Date(endDateStr + "T00:00:00");
+
+            while (currentDate <= endDate) {
+                dates.push(currentDate.toISOString().split('T')[0]);
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+            return dates;
+        }
+
+        /**
+         * Salva as alterações do modal "Alterar" no Firebase
+         */
+        async function saveAlteracao() {
+            const ctx = clickedAbsenceContext;
+            const newStartDate = document.getElementById('alterar-data-inicio').value;
+            const newEndDate = document.getElementById('alterar-data-fim').value;
+
+            if (!newStartDate || !newEndDate) {
+                alert("Por favor, preencha as datas de início e fim.");
+                return;
+            }
+
+            let updatedData = {}; // Objeto para enviar ao Firebase
+
+            if (ctx.absenceNode === 'vacations') {
+                // Salva no formato de Férias (range)
+                const newDays = calculateDaysBetween(newStartDate, newEndDate);
+                updatedData = {
+                    ...ctx.absenceData, // Mantém dados originais (ex: status)
+                    startDate: newStartDate,
+                    days: newDays
+                };
+            } else {
+                // Salva no formato de LM/OAE (array de datas)
+                const newDatesArray = getDatesInRange(newStartDate, newEndDate);
+                updatedData = {
+                    ...ctx.absenceData, // Mantém dados originais (se houver)
+                    dates: newDatesArray
+                };
+            }
+
+            const person = ctx.person;
+            const refPath = `appState/${person.role}s/${person.id}/${ctx.absenceNode}/${ctx.absenceKey}`;
+
+            const button = document.getElementById('btn-salvar-alteracao');
+            try {
+                button.disabled = true;
+                button.textContent = "Salvando...";
+
+                // Usamos .update() para não apagar outros dados do nó (ex: status)
+                await database.ref(refPath).update(updatedData);
+
+                closeModal('modal-alterar');
+                loadCalendarData(); // Recarrega o calendário
+
+            } catch (error) {
+                alert("Erro ao salvar: " + error.message);
+            } finally {
+                button.disabled = false;
+                button.textContent = "Salvar Alterações";
+            }
+        }
+
+        /**
+         * Salva o novo afastamento do modal "Adicionar" no Firebase
+         */
+        async function saveAdicionar() {
+            const personValue = document.getElementById('add-nome').value;
+            const absenceNode = document.getElementById('add-tipo').value;
+            const startDate = document.getElementById('add-data-inicio').value;
+            const endDate = document.getElementById('add-data-fim').value;
+
+            if (!personValue || !startDate || !endDate) {
+                alert("Por favor, preencha todos os campos.");
+                return;
+            }
+
+            const [personId, personRole] = personValue.split('|');
+            const refPath = `appState/${personRole}s/${personId}/${absenceNode}`;
+
+            let newLeaveObject = {};
+
+            if (absenceNode === 'vacations') {
+                // Salva no formato de Férias (range)
+                const days = calculateDaysBetween(startDate, endDate);
+                newLeaveObject = {
+                    startDate: startDate,
+                    days: days,
+                    status: 'approved' // Define como 'approved' por padrão
+                };
+            } else {
+                // Salva no formato de LM/OAE (array de datas)
+                const datesArray = getDatesInRange(startDate, endDate);
+                newLeaveObject = {
+                    dates: datesArray
+                };
+            }
+
+            try {
+                this.disabled = true;
+                this.textContent = "Adicionando...";
+
+                await database.ref(refPath).push(newLeaveObject);
+
+                closeModal('modal-adicionar');
+                loadCalendarData(); // Recarrega o calendário
+
+            } catch (error) {
+                alert("Erro ao adicionar: " + error.message);
+            } finally {
+                this.disabled = false;
+                this.textContent = "Adicionar Afastamento";
+            }
+        }
+
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1407 @@
+:root {
+  /* Paleta principal (versão teste) */
+  --bg: #f5f6f7;
+  /* cinza muito claro de fundo */
+  --panel: #ffffff;
+  /* cartão / painéis (branco) */
+  --muted: #6b7280;
+  /* texto secundário (cinza) */
+  --accent: #013e4a;
+  /* azul petróleo (principal) */
+  --accent-2: #2b6cb0;
+  /* azul secundário */
+  --card-shadow: 0 8px 24px rgba(16, 24, 40, 0.06);
+  --danger: #ef4444;
+  /* vermelho para ações destrutivas */
+  --ok: #10b981;
+  /* sucesso (mantido) */
+
+  --danger-light: #fca5a5;
+  /* Vermelho claro para bordas e destaques */
+  --danger-dark: #b91c1c;
+  /* Vermelho escuro para textos de aviso */
+  --text-color-light: #4b5563;
+  /* Cinza escuro para texto geral */
+
+  --warning: #f59e0b;
+  /* amarelo/laranja para pendências */
+  --input-bg: #f3f4f6;
+  --input-border: #e5e7eb;
+  --checkbox-size: 20px;
+
+  /* Gradientes / sombras */
+  --gradient-primary: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+  --gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Reset e tipografia */
+* {
+  box-sizing: border-box;
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial
+}
+
+body {
+  margin: 0;
+  background: linear-gradient(180deg, #fbfdf9, var(--bg));
+  color: #0f172a;
+  min-height: 100vh
+}
+
+/* --- ESTILOS GERAIS DA APLICAÇÃO --- */
+.app {
+  max-width: 1150px;
+  margin: 28px auto;
+  padding: 20px;
+}
+
+.app-grid {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar-nav {
+  width: 280px;
+  background-color: var(--panel);
+  box-shadow: var(--card-shadow);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex-shrink: 0;
+  /* Impede que a sidebar encolha */
+}
+
+.sidebar-item {
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--muted);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: background-color 0.2s, color 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.sidebar-item:hover {
+  background-color: rgba(1, 62, 74, 0.08);
+  /* azul petróleo suave */
+  color: var(--accent);
+}
+
+.sidebar-item.active {
+  background-color: var(--accent);
+  color: white;
+}
+
+.sidebar-item.active:hover {
+  background-color: var(--accent);
+  color: white;
+}
+
+.main-content {
+  flex-grow: 1;
+  padding: 24px;
+}
+
+.content-section {
+  display: none;
+}
+
+.content-section.active {
+  display: block;
+}
+
+h1 {
+  margin: 0;
+  font-size: 20px;
+  color: var(--accent)
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 13px
+}
+
+.inline {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center
+}
+
+.card {
+  background: var(--gradient-card);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid rgba(15, 23, 42, 0.03);
+  margin-bottom: 20px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 18px
+}
+
+.list {
+  max-height: 640px;
+  overflow: auto
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.03);
+  margin-bottom: 10px;
+  background: linear-gradient(180deg, transparent, #ffffff)
+}
+
+/* Estilo para a linha de usuários que inclui checkbox */
+.user-row-selectable {
+  display: grid;
+  grid-template-columns: var(--checkbox-size) 1fr auto;
+  /* Checkbox | Detalhes | Ações */
+  gap: 12px;
+  align-items: center;
+  padding: 10px;
+}
+
+.user-row-selectable input[type="checkbox"] {
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  margin: 0;
+}
+
+.icon-placeholder {
+  width: var(--checkbox-size);
+  height: var(--checkbox-size);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: default;
+}
+
+.chip {
+  background: rgba(1, 62, 74, 0.08);
+  padding: 6px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--accent)
+}
+
+.small {
+  font-size: 13px
+}
+
+.button {
+  background: var(--gradient-primary);
+  color: white;
+  border: 0;
+  padding: 8px 12px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1)
+}
+
+.button.ghost {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid rgba(1, 62, 74, 0.12)
+}
+
+.button.alt {
+  background: var(--accent-2);
+  color: white
+}
+
+.button.danger {
+  background: var(--danger);
+  color: white
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px
+}
+
+.form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 8px
+}
+
+.small-muted {
+  font-size: 12px;
+  color: var(--muted)
+}
+
+.calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px
+}
+
+.calendar .day {
+  min-height: 80px;
+  padding: 8px;
+  border-radius: 8px;
+  background: linear-gradient(180deg, #ffffff, #fbfbf8);
+  border: 1px solid rgba(15, 23, 42, 0.08)
+}
+
+.calendar .date {
+  font-weight: 700;
+  margin-bottom: 6px
+}
+
+.tag {
+  display: inline-block;
+  padding: 4px 6px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-top: 4px
+}
+
+.tag.bank {
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  padding: 4px 8px;
+  line-height: 1;
+  white-space: nowrap
+}
+
+.tag.neg {
+  background: rgba(239, 68, 68, 0.10);
+  color: var(--danger)
+}
+
+.totals {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 10px;
+  flex-wrap: wrap
+}
+
+.total-pill {
+  padding: 12px;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fff, #fbfbfb);
+  min-width: 150px;
+  text-align: center;
+  border: 1px solid rgba(15, 23, 42, 0.08)
+}
+
+.total-pill .num {
+  font-weight: 800;
+  font-size: 18px
+}
+
+.input,
+input,
+select,
+textarea {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+  width: 100%;
+  font-size: 14px
+}
+
+.modal-backdrop {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(10, 12, 15, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999
+}
+
+.modal {
+  width: 700px;
+  max-width: 96%;
+  background: var(--panel);
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: var(--card-shadow)
+}
+
+.kv {
+  display: flex;
+  gap: 8px;
+  align-items: center
+}
+
+.audit {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 6px
+}
+
+.badge {
+  padding: 6px 8px;
+  border-radius: 8px;
+  font-weight: 700
+}
+
+.settings-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px
+}
+
+/* Nova classe para alinhar checkboxes */
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.form-check input[type="checkbox"] {
+  width: auto;
+  margin-right: 0;
+}
+
+.form-check-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+@media (max-width:980px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .calendar .day {
+    min-height: 64px
+  }
+}
+
+/* Animações suaves e efeitos modernos */
+.sidebar-item {
+  transition: all 0.3s ease;
+}
+
+.sidebar-item::before {
+  content: '';
+  position: absolute;
+  left: -100%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-primary);
+  transition: left 0.3s ease;
+  z-index: -1;
+}
+
+.sidebar-item:hover::before {
+  left: 0;
+}
+
+/* Loading states */
+.loading {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Itens da lixeira */
+.trash-item-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(15, 23, 42, 0.03);
+  margin-bottom: 10px;
+  background: linear-gradient(180deg, transparent, #ffffff);
+}
+
+.trash-item-row input[type="checkbox"] {
+  width: auto;
+}
+
+.trash-item-details {
+  flex-grow: 1;
+}
+
+/* Balão de contagem (badge) na sidebar */
+.sidebar-item .badge {
+  background-color: var(--danger);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  min-width: 20px;
+  text-align: center;
+  margin-left: auto;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.sidebar-item.has-pending {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+  border: 1px solid var(--danger);
+  padding: 11px;
+}
+
+.sidebar-item.has-pending:hover {
+  background-color: rgba(239, 68, 68, 0.2);
+  color: var(--danger);
+}
+
+.sidebar-item.has-pending.active {
+  background-color: var(--danger);
+  color: white;
+  border: 1px solid var(--danger);
+}
+
+.sidebar-item.has-pending.active .badge {
+  background-color: white;
+  color: var(--danger);
+}
+
+/* Ajustes do calendário: botão Remover e wrapper */
+.calendar .day .button.ghost {
+  padding: 4px 6px;
+  font-size: 10px;
+  white-space: nowrap;
+  margin-left: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+/* Quando passar o mouse sobre o dia, mostra a lixeira */
+.calendar .day:hover .button.ghost {
+  opacity: 1;
+}
+
+.calendar .day .wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Estilo para tag de férias (amarelo) */
+.tag.vacation {
+  background: linear-gradient(135deg, #fbbd23 0%, var(--warning) 100%);
+  color: #422006;
+  font-weight: 600;
+  padding: 4px 8px;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+}
+
+/* NOVO: Estilo para tag de férias agendadas (verde) */
+.tag.vacation-approved {
+  background: linear-gradient(135deg, var(--ok) 0%, #059669 100%);
+  color: white;
+  font-weight: 600;
+  padding: 4px 8px;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);
+}
+
+/* --- Estilos modernos para Tela de Login (versão teste) --- */
+.login-screen {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: linear-gradient(135deg, var(--bg) 0%, #f9fbf7 100%);
+}
+
+.login-card {
+  max-width: 400px;
+  width: 100%;
+  padding: 30px;
+  text-align: center;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background: var(--panel);
+}
+
+.login-card h2 {
+  color: var(--accent);
+  margin-bottom: 24px;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.login-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input-modern {
+  width: 100%;
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid var(--input-border);
+  background: var(--input-bg);
+  transition: all 0.3s ease;
+  font-size: 15px;
+  color: #374151;
+}
+
+.input-modern:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(1, 62, 74, 0.18);
+  outline: none;
+  background: white;
+}
+
+.password-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.password-wrapper .input-modern {
+  padding-right: 40px;
+}
+
+.password-toggle-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--muted);
+  font-size: 16px;
+  transition: color 0.2s;
+}
+
+.password-toggle-icon:hover {
+  color: var(--accent);
+}
+
+.login-buttons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-top: 15px;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+#btnLogin {
+  flex-grow: 1;
+  min-width: 100px;
+  padding: 10px 15px;
+}
+
+.login-buttons .button.ghost {
+  flex-grow: 0;
+  white-space: nowrap;
+  padding: 10px 15px;
+}
+
+.login-buttons .button.ghost.small {
+  font-size: 13px;
+  text-decoration: underline;
+  border: none;
+  padding: 10px 0;
+  margin-left: auto;
+}
+
+.login-buttons .button.ghost.small:hover {
+  background: transparent;
+  color: var(--danger);
+  transform: none;
+}
+
+/* Pequenos ajustes visuais (sombras ao hover) */
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/*informação sobre bloqueio estagiário*/
+/* Novo estilo para o link de regras */
+.rules-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--input-bg);
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid var(--input-border);
+  margin-top: 4px;
+  transition: all 0.2s ease;
+}
+
+.rules-link:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+  background-color: #fff;
+}
+
+.rules-link svg {
+  stroke: var(--muted);
+  transition: stroke 0.2s ease;
+}
+
+.rules-link:hover svg {
+  stroke: var(--accent);
+}
+
+/* =======================================
+   ESTILOS PARA ABAS (TABS)
+   ======================================= */
+.tabs {
+  display: flex;
+  gap: 8px;
+  border-bottom: 1px solid var(--input-border);
+}
+
+.tab-button i {
+  color: var(--accent);
+  margin-right: 6px;
+}
+
+.tab-button {
+  padding: 8px 16px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  font-weight: 600;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.tab-button:hover {
+  color: var(--accent);
+}
+
+.tab-button.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.tab-content {
+  display: none;
+  /* Esconde o conteúdo por padrão */
+  padding-top: 15px;
+}
+
+.tab-content.active {
+  display: block;
+  /* Mostra apenas o conteúdo da aba ativa */
+}
+
+/* =======================================
+   GRUPO DE BOTÕES DE FILTRO
+   ======================================= */
+.filter-button-group {
+  display: inline-flex;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--input-border);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.filter-button-group .button {
+  border-radius: 0;
+  border: none;
+  border-right: 1px solid var(--input-border);
+  transition: background-color 0.2s ease, color 0.2s ease;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.filter-button-group .button:last-child {
+  border-right: none;
+}
+
+.filter-button-group .button.ghost {
+  background: var(--panel);
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.filter-button-group .button.ghost:hover {
+  background-color: var(--input-bg);
+  color: var(--accent);
+}
+
+.filter-button-group .button:not(.ghost) {
+  background: var(--accent);
+  color: white;
+  font-weight: 600;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* garantir que html/body possam usar 100% da altura */
+html,
+body {
+  height: 100%;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - var(--header-height, 96px));
+  gap: 0;
+}
+
+#dynamicContent {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  max-height: none !important;
+  padding-bottom: 1px;
+}
+
+/* =======================================
+   NOVOS ESTILOS - BARRAS LATERAIS DE STATUS
+   ======================================= */
+.row.status-pending {
+  border-left: 4px solid var(--warning);
+}
+
+.row.status-approved {
+  border-left: 4px solid var(--ok);
+}
+
+.row.status-rejected {
+  border-left: 4px solid var(--danger);
+}
+
+/* --- ESTILOS PARA SIDEBAR DOBRÁVEL (ACORDEÃO) --- */
+.sidebar-group {
+  margin-top: 12px;
+  border-bottom: 1px solid var(--input-border);
+  padding-bottom: 12px;
+}
+
+.sidebar-group:last-child {
+  border-bottom: none;
+}
+
+.sidebar-group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px 4px;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.sidebar-group-header:hover {
+  background-color: rgba(1, 62, 74, 0.05);
+  /* azul petróleo bem suave */
+  color: var(--accent);
+}
+
+.sidebar-group-header .fas {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-group-content {
+  max-height: 500px;
+  /* Um valor alto para permitir que o conteúdo caiba */
+  overflow: hidden;
+  transition: max-height 0.35s ease-in-out;
+  padding-top: 5px;
+}
+
+/* Estado recolhido (collapsed) */
+.sidebar-group.collapsed .sidebar-group-content {
+  max-height: 0;
+  padding-top: 0;
+}
+
+.sidebar-group.collapsed .sidebar-group-header .fas {
+  transform: rotate(-90deg);
+}
+
+/* NOVO ESTILO: Para destacar um grupo dobrável com notificação pendente */
+.sidebar-group.group-has-pending.collapsed .sidebar-group-header {
+  background-color: rgba(239, 68, 68, 0.08);
+  /* Fundo avermelhado suave */
+  color: var(--danger);
+  /* Texto em vermelho */
+  font-weight: 700;
+}
+
+.sidebar-group.group-has-pending.collapsed .sidebar-group-header:hover {
+  background-color: rgba(239, 68, 68, 0.15);
+  /* Um pouco mais forte no hover */
+}
+
+/* --- NOVOS ESTILOS PARA NAVEGAÇÃO DO CALENDÁRIO --- */
+.calendar-nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  margin-top: 5px;
+  margin-bottom: 20px;
+}
+
+.calendar-nav-label {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--accent);
+  min-width: 180px;
+  /* Evita que o layout mude com o tamanho do nome do mês */
+  text-align: center;
+}
+
+.calendar-nav .button.ghost {
+  padding: 0;
+  /* Remove padding para centralizar o ícone */
+  border-radius: 50%;
+  /* Deixa os botões redondos */
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* =================================================== */
+/* --- NOVO: Estilos do Painel de Gerenciamento Rápido --- */
+/* =================================================== */
+
+/* Ajusta o modal base para acomodar o novo design */
+.modal {
+  /* A LARGURA FIXA FOI REMOVIDA DAQUI */
+  padding: 0;
+  /* Remove o padding padrão para termos controle total */
+}
+
+/* NOVA REGRA: A largura agora se aplica apenas ao modal com esta classe específica */
+.modal.modal-user-management {
+  width: 650px;
+}
+
+.user-manage-modal {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 1. Cabeçalho do Modal */
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid var(--input-border);
+}
+
+.user-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: var(--accent);
+  color: white;
+  font-size: 22px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.user-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.user-username {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.role-tag {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.role-tag-intern {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.role-tag-servidor {
+  background-color: #dcfce7;
+  color: #166534;
+}
+
+.role-tag-admin {
+  background-color: #e0e7ff;
+  color: #3730a3;
+}
+
+.modal-close-btn {
+  margin-left: auto;
+  /* Empurra o botão de fechar para a direita */
+}
+
+/* 2. Seções de Conteúdo */
+.modal-section {
+  padding: 20px;
+  border-bottom: 1px solid var(--input-border);
+}
+
+.modal-section:last-child {
+  border-bottom: none;
+}
+
+.section-title {
+  margin: 0 0 16px 0;
+  font-size: 1rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+/* 3. Ações Rápidas */
+.action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.action-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--input-border);
+  border-radius: 12px;
+  background-color: #f9fafb;
+  cursor: pointer;
+  transition: background-color 0.2s, border-color 0.2s, box-shadow 0.2s;
+  text-align: left;
+  color: #374151;
+  /* Reseta cor do botão */
+}
+
+.action-card:hover {
+  background-color: white;
+  border-color: var(--accent-2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.action-card i {
+  font-size: 24px;
+  color: var(--accent-2);
+}
+
+.action-card-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.action-card-text strong {
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.action-card-text span {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+/* 4. Ferramentas Administrativas */
+.admin-tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  /* Para o link do WhatsApp */
+}
+
+/* 5. Zona de Perigo (Simplificado) */
+.danger-zone {
+  background-color: var(--panel);
+  /* Alterado para branco (usando a variável do painel) */
+  padding-top: 12px;
+  padding-bottom: 12px;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 12px;
+  border-top: 1px solid var(--input-border);
+}
+
+.danger-zone-content {
+  display: flex;
+  justify-content: flex-end;
+  /* Alinha o botão à direita */
+  align-items: center;
+}
+
+/* NOVO: Estilo "fantasma" para o botão de excluir */
+.danger-zone-content .button.danger {
+  background-color: transparent;
+  color: var(--danger);
+  border: 1px solid var(--danger-light);
+  /* Usa a borda vermelha clara que definimos antes */
+}
+
+/* Efeito ao passar o mouse por cima */
+.danger-zone-content .button.danger:hover {
+  background-color: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+
+.danger-zone-content p {
+  margin: 0;
+  color: #b91c1c;
+  font-size: 14px;
+  flex-grow: 1;
+}
+
+.fab.fa-whatsapp {
+  font-size: 16px;
+  /* Ajuste para o ícone do WhatsApp */
+}
+
+
+/* --- NOVO: Estilos para Botões de Ícone --- */
+.icon-button {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  /* Tamanho do ícone */
+}
+
+/* --- CORREÇÃO: Estilo para o botão de perigo no modo "fantasma" --- */
+.button.danger.ghost {
+  background-color: transparent !important;
+  color: var(--danger) !important;
+  border: 1px solid var(--danger-light) !important;
+  /* Força a aplicação da borda vermelha clara */
+}
+
+/* Efeito ao passar o mouse */
+.button.danger.ghost:hover {
+  background-color: var(--danger) !important;
+  color: white !important;
+  border-color: var(--danger) !important;
+}
+
+
+/* --- NOVO: Estilos para Detalhes do Usuário no Modal --- */
+
+
+.user-details-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--muted);
+  padding: 4px 8px;
+  background-color: var(--input-bg);
+  border-radius: 6px;
+  border: 1px solid var(--input-border);
+}
+
+.detail-item i {
+  font-size: 12px;
+}
+
+/* --- NOVO: Estilos para Dropdown nas Abas --- */
+.tab-dropdown-container {
+  position: relative;
+}
+
+.tab-dropdown-menu {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background-color: var(--panel);
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  box-shadow: var(--card-shadow);
+  min-width: 200px;
+  z-index: 100;
+  overflow: hidden;
+  padding: 4px;
+}
+
+.tab-dropdown-menu.show {
+  display: block;
+  animation: animate__fadeIn 0.2s;
+}
+
+.tab-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--muted);
+  transition: background-color 0.2s, color 0.2s;
+  border-radius: 6px;
+}
+
+.tab-dropdown-item:hover {
+  background-color: rgba(1, 62, 74, 0.08);
+  /* azul petróleo suave */
+  color: var(--accent);
+}
+
+.tab-dropdown-item i {
+  color: var(--accent);
+  width: 16px;
+  text-align: center;
+}
+
+/* --- ESTILO DE HOVER VERMELHO PARA O BOTÃO SAIR --- */
+.btn-logout:hover {
+  color: var(--danger);
+  border-color: var(--danger-light);
+}
+
+/* =======================================
+   ESTILOS PARA LAYOUT GRID DE AFASTAMENTOS
+   ======================================= */
+.afastamentos-grid-container {
+  display: grid;
+
+  /* 'auto-fill': Preenche com o máximo de colunas que couberem.
+    'minmax(350px, 1fr)': Cada coluna terá no MÍNIMO 350px,
+    mas pode se esticar (1fr) para preencher o espaço igualmente.
+  */
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+
+  gap: 16px;
+  margin-top: 15px;
+}
+
+/* O @media (max-width: 768px) não é mais necessário,
+  pois o 'auto-fill' já fará o layout ter 1 coluna
+  automaticamente em telas menores! 
+*/
+
+/* Removemos o 'max-width: 500px' daqui para permitir
+  que os cards realmente preencham o espaço (1fr)
+*/
+.afastamentos-grid-container>div {
+  width: 100%;
+  /* Garante que ele ocupe o espaço da coluna */
+}
+
+
+/* =======================================
+   ESTILOS PARA ACORDEÃO DENTRO DO MODAL
+   ======================================= */
+.accordion-item {
+  border: 1px solid var(--input-border);
+  border-radius: 8px;
+  margin-bottom: 10px;
+  overflow: hidden;
+  /* Importante para a animação */
+}
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 15px;
+  cursor: pointer;
+  background-color: var(--input-bg);
+  transition: background-color 0.2s ease;
+}
+
+.accordion-header:hover {
+  background-color: #e5e7eb;
+  /* Um cinza um pouco mais escuro no hover */
+}
+
+.accordion-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  /* Remove a cor específica do título aqui, vamos usar a cor da tag */
+}
+
+.accordion-header .badge {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+}
+
+.accordion-header .accordion-icon {
+  font-size: 0.9rem;
+  transition: transform 0.3s ease;
+  color: var(--muted);
+}
+
+.accordion-content {
+  padding: 0 15px 15px 15px;
+  /* Adiciona padding só embaixo e nas laterais */
+  max-height: 400px;
+  /* Altura máxima antes de rolar */
+  overflow-y: auto;
+  transition: max-height 0.35s ease-in-out, padding 0.35s ease-in-out;
+  background-color: #ffffff;
+  /* Fundo branco para o conteúdo */
+  border-top: 1px solid var(--input-border);
+  /* Linha separadora */
+}
+
+/* Estado Colapsado */
+.accordion-content.collapsed {
+  max-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-top: none;
+  /* Remove a borda quando colapsado */
+}
+
+.accordion-header.collapsed .accordion-icon {
+  transform: rotate(-90deg);
+}
+
+/* Cores específicas para os títulos no cabeçalho do acordeão */
+.accordion-header .title-ferias {
+  color: #10b981;
+}
+
+.accordion-header .title-provas {
+  color: #b45309;
+}
+
+.accordion-header .title-licenca {
+  color: #c2410c;
+}
+
+.accordion-header .title-npj {
+  color: #4b5563;
+}
+
+.accordion-header .title-oae {
+  color: #4D7EA8;
+}
+
+/* * NOVOS ESTILOS PARA NOTIFICAÇÕES AZUIS (PRÉ-CADASTRO) 
+ * (VERSÃO CORRIGIDA COM FUNDO)
+ */
+
+/* Cor azul para o texto do item (ex: "Pré-cadastros Pendentes") */
+.sidebar-item.has-pending-info {
+  color: #2b6cb0;
+  /* Azul escuro */
+  font-weight: 700;
+  /* Adiciona um leve fundo azul claro também ao item */
+  background-color: rgba(235, 248, 255, 0.6);
+}
+
+/* Cor azul para o badge (contador) */
+.sidebar-item.has-pending-info .badge {
+  background-color: #bee3f8;
+  /* Fundo azul claro */
+  color: #2b6cb0;
+  /* Texto azul escuro */
+  border: 1px solid #90cdf4;
+}
+
+/* * ESTA É A CORREÇÃO PRINCIPAL: 
+ * Cor azul para o cabeçalho do GRUPO (ex: "GERENCIAMENTO DO SISTEMA") 
+ */
+.sidebar-group.group-has-pending-info>.sidebar-group-header {
+  background-color: #ebf8ff;
+  /* Fundo azul claro (O que faltava) */
+  color: #2c5282;
+  /* Azul mais escuro para contraste */
+  font-weight: 700;
+}
+
+/* (Opcional) Efeito de 'pulsar' para o ícone do grupo azul */
+.sidebar-group.group-has-pending-info>.sidebar-group-header>i {
+  animation: pulse-blue 1.5s infinite;
+}
+
+@keyframes pulse-blue {
+  0% {
+    color: #2b6cb0;
+    transform: scale(1);
+  }
+
+  50% {
+    color: #63b3ed;
+    transform: scale(1.1);
+  }
+
+  100% {
+    color: #2b6cb0;
+    transform: scale(1);
+  }
+}

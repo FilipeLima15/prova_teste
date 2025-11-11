@@ -1,0 +1,49 @@
+/* theme-test.css - Estilo de sobreposição para ambiente de teste */
+
+:root {
+  /* SOBREPOSIÇÃO DA PALETA DE CORES PARA TONS DE VERMELHO (TESTE)
+    Aqui, redefinimos as variáveis de cor do seu arquivo styles.css original.
+  */
+
+  /* Paleta principal (vermelho para teste) */
+  --bg: #ffffff;             /* Fundo com leve tom avermelhado */
+  --panel: #ffffff;          /* Painéis brancos para manter a legibilidade */
+  --muted: #6b7280;          /* Texto secundário (cinza, mantido para leitura) */
+  --accent: #991b1b;         /* Vermelho escuro como cor principal */
+  --accent-2: #b91c1c;       /* Vermelho um pouco mais claro como secundário */
+  --danger: #ef4444;         /* Mantido como vermelho de perigo */
+  --ok: #10b981;             /* Mantido como verde de sucesso para não confundir o usuário */
+  --input-bg: #fee2e2;
+  --input-border: #fecaca;
+
+  /* Gradientes / sombras */
+  --gradient-primary: linear-gradient(135deg, var(--accent) 0%, var(--accent-2) 100%);
+}
+
+/* BANNER FIXO PARA INDICAR O AMBIENTE DE TESTE
+  Adiciona uma faixa no topo da página para deixar claro que é um ambiente de teste.
+*/
+body::before {
+  content: 'AMBIENTE DE TESTE';
+  display: block;
+  background-color: var(--accent);
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding: 5px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10000; /* Garante que fique acima de tudo */
+  font-size: 14px;
+}
+
+/* Ajusta o topo da aplicação para não ficar embaixo do banner */
+.app {
+  padding-top: 50px;
+}
+
+.login-screen {
+    padding-top: 20px;
+}
