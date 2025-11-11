@@ -32,7 +32,7 @@ if (typeof firebase.appCheck === 'function') {
     const appCheck = firebase.appCheck();
     
     appCheck.activate(
-        '6LeGUgksAAAAANtCbtTSiUD34wx2hqni0BDm5PBq', // Site Key do reCAPTCHA
+        '6LfQeQksAAAAAHFK1LihId7OXpEvBmBg1Sc9-3sL', // Site Key do reCAPTCHA
         true // Permite passar requisições em localhost para desenvolvimento
     );
     
