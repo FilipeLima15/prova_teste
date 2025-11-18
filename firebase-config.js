@@ -34,9 +34,12 @@ if (typeof firebase.appCheck === 'function') {
     appCheck.activate(
         '6LfQeQksAAAAAHFK1LihId7OXpEvBmBg1Sc9-3sL', // Site Key do reCAPTCHA
         true // Permite passar requisições em localhost para desenvolvimento
+        //https://console.cloud.google.com/security/recaptcha/6LfQeQksAAAAAHFK1LihId7OXpEvBmBg1Sc9-3sL/overview?project=teste-ccad6&authuser=0
+        //https://www.google.com/recaptcha/admin/site/738818512/setup
     );
     
     console.log('✅ App Check ativado com sucesso!');
 } else {
     console.warn('⚠️ App Check não disponível. Verifique se o script foi carregado.');
 }
+
